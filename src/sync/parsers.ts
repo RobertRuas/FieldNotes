@@ -223,9 +223,10 @@ export function parseEntity(entity: SyncEntityName, value: unknown): ParsedEntit
       const size = amount(camel, 'size');
       const localUri = optionalText(camel, 'localUri', null);
       const remotePath = optionalText(camel, 'remotePath', null);
+      const thumbnail = optionalText(camel, 'thumbnail', null);
       if (!userId || !noteId || !kind || name === null || !mimeType || size === null) return null;
-      if (localUri === undefined || remotePath === undefined) return null;
-      return { entity, record: { ...base, userId, noteId, kind, name, mimeType, size, localUri, remotePath } };
+      if (localUri === undefined || remotePath === undefined || thumbnail === undefined) return null;
+      return { entity, record: { ...base, userId, noteId, kind, name, mimeType, size, localUri, remotePath, thumbnail } };
     }
     case 'audio_recordings': {
       const userId = text(camel, 'userId');

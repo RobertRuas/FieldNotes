@@ -17,12 +17,17 @@ import {
 } from '@ionic/vue';
 import { ellipsisHorizontal } from 'ionicons/icons';
 import EditorToolbar from '@/components/EditorToolbar.vue';
+import NoteAudio from '@/components/NoteAudio.vue';
+import NoteFiles from '@/components/NoteFiles.vue';
+import NotePhotos from '@/components/NotePhotos.vue';
 import NoteTaskList from '@/components/NoteTaskList.vue';
 import RichTextEditor from '@/components/RichTextEditor.vue';
 import SyncStatus from '@/components/SyncStatus.vue';
 import { editorKey, type EditorApi, type EditorCommand } from '@/composables/editorContext';
 import { useAutosave } from '@/composables/useAutosave';
 import { useKeyboardInset } from '@/composables/useKeyboardInset';
+import { useAttachmentsStore } from '@/stores/attachmentsStore';
+import { useAudioStore } from '@/stores/audioStore';
 import { useAuthStore } from '@/stores/authStore';
 import { useCollectionsStore } from '@/stores/collectionsStore';
 import { useNotesStore } from '@/stores/notesStore';
@@ -55,6 +60,8 @@ const auth = useAuthStore();
 const notes = useNotesStore();
 const collections = useCollectionsStore();
 const tasks = useTasksStore();
+const attachmentStore = useAttachmentsStore();
+const audioStore = useAudioStore();
 const keyboard = useKeyboardInset();
 const editorApi = ref<EditorApi | null>(null);
 provide(editorKey, editorApi);
@@ -128,12 +135,24 @@ const collectionButtons = computed<SheetButton[]>(() => [
   { text: 'Cancelar', role: 'cancel' },
 ]);
 
+function applyMedia(): void {
+  const id = noteIdRef.value;
+  const files = attachmentStore.forNote(id);
+  photos.value = files.filter((item) => item.kind === 'photo').map((item) => item.id);
+  documents.value = files.filter((item) => item.kind !== 'photo').map((item) => item.id);
+  attachments.value = files.map((item) => item.id);
+  audio.value = audioStore.forNote(id).map((item) => item.id);
+}
+
 function shouldPersist(): boolean {
   return (
     hasVisibleContent(title.value, text.value) ||
     collectionId.value !== null ||
     reminderAt.value !== null ||
-    tasks.forNote(noteIdRef.value).length > 0
+    tasks.forNote(noteIdRef.value).length > 0 ||
+    photos.value.length > 0 ||
+    documents.value.length > 0 ||
+    audio.value.length > 0
   );
 }
 
@@ -224,7 +243,14 @@ async function load(id: string): Promise<void> {
   photos.value = [...note.photos];
   documents.value = [...note.documents];
   audio.value = [...note.audio];
+  applyMedia();
   revision.value += 1;
+}
+
+async function onMedia(): Promise<void> {
+  applyMedia();
+  touch();
+  await autosave.flush();
 }
 
 function onTitle(event: Event): void {
@@ -398,7 +424,11 @@ onBeforeUnmount(() => {
           :date="dateKey"
           @changed="touch"
         />
-        <p class="fn-later">Fotos, documentos e áudio ficam para a próxima versão.</p>
+        <template v-if="noteIdRef">
+          <NotePhotos :note-id="noteIdRef" @changed="onMedia" />
+          <NoteFiles :note-id="noteIdRef" @changed="onMedia" />
+          <NoteAudio :note-id="noteIdRef" @changed="onMedia" />
+        </template>
       </template>
     </ion-content>
     <ion-footer v-if="!missing" class="fn-dock" :style="dockStyle">

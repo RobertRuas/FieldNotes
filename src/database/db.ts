@@ -5,6 +5,8 @@ import type {
   AudioRecording,
   Collection,
   Device,
+  FileTransfer,
+  LocalFile,
   Note,
   Notification,
   SyncOperation,
@@ -23,6 +25,8 @@ export const db = new Dexie('fieldnotes') as Dexie & {
   settings: EntityTable<AppSettings, 'id'>;
   sync_queue: EntityTable<SyncOperation, 'id'>;
   devices: EntityTable<Device, 'id'>;
+  local_files: EntityTable<LocalFile, 'id'>;
+  file_queue: EntityTable<FileTransfer, 'id'>;
 };
 
 db.version(1).stores({
@@ -41,6 +45,12 @@ db.version(1).stores({
 // Índices novos da tarefa. Os outros stores continuam da versão 1.
 db.version(2).stores({
   tasks: 'id, userId, noteId, collectionId, done, date, updatedAt, deletedAt, syncStatus',
+});
+
+// Arquivo original e fila de envio. A lista da nota não carrega o blob.
+db.version(3).stores({
+  local_files: 'id',
+  file_queue: 'id, targetId, status, updatedAt',
 });
 
 export async function openDatabase(): Promise<void> {

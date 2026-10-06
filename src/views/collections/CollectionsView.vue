@@ -107,7 +107,6 @@ async function confirmRename(): Promise<void> {
           label="Nome da coleção"
           label-placement="stacked"
           v-aria="'Nome da coleção'"
-          placeholder="Nome da coleção"
           :value="name"
           @ionInput="onName"
         />

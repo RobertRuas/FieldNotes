@@ -85,6 +85,8 @@ export interface Attachment extends EntityMeta {
   size: number;
   localUri: string | null;
   remotePath: string | null;
+  /** Miniatura para a lista. O arquivo original não entra neste campo. */
+  thumbnail: string | null;
 }
 
 export interface AudioRecording extends EntityMeta {
@@ -116,6 +118,25 @@ export interface Device extends EntityMeta {
   name: string;
   platform: DevicePlatform;
   pushToken: string | null;
+}
+
+/** Estado do envio do arquivo. Não é o syncStatus do registro. */
+export type TransferStatus = 'aguardando' | 'sincronizando' | 'sincronizado' | 'erro';
+
+export interface FileTransfer {
+  id: string;
+  target: 'attachment' | 'audio';
+  targetId: string;
+  status: TransferStatus;
+  attempts: number;
+  lastError: string | null;
+  updatedAt: string;
+}
+
+export interface LocalFile {
+  id: string;
+  mimeType: string;
+  blob: Blob;
 }
 
 export interface SyncOperation extends EntityMeta {

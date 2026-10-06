@@ -756,6 +756,172 @@ textarea {
   color: var(--fn-danger);
 }
 
+.fn-media {
+  display: grid;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.fn-media h2 {
+  margin: 0;
+  font-size: var(--fn-text-sm);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fn-ink-soft);
+}
+
+.fn-media-actions,
+.fn-rec,
+.fn-clips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.fn-clips {
+  display: grid;
+}
+
+.fn-photos {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+}
+
+.fn-photo-card {
+  margin: 0;
+  width: 148px;
+  flex: none;
+  display: grid;
+  gap: 4px;
+}
+
+.fn-photo-hit {
+  width: 100%;
+  height: 96px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--fn-surface);
+  color: var(--fn-ink-soft);
+}
+
+.fn-photo-hit img,
+.fn-photo-fallback,
+.fn-file-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.fn-photo-fallback {
+  display: grid;
+  place-items: center;
+  font-size: var(--fn-text-sm);
+}
+
+.fn-files {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.fn-file-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.fn-file-row > div {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+}
+
+.fn-file-row strong,
+.fn-file-row small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fn-file-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  flex: none;
+}
+
+.fn-transfer {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  color: var(--fn-ink-soft);
+  font-size: var(--fn-text-xs);
+}
+
+.fn-transfer[data-status='erro'] {
+  color: var(--fn-danger);
+}
+
+.fn-rec-live {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.fn-rec-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 99px;
+  background: var(--fn-danger);
+  display: inline-block;
+  animation: fn-pulse 1s ease infinite;
+}
+
+.fn-player {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.fn-player .fn-transfer {
+  grid-column: 1 / -1;
+}
+
+.fn-player-bar {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.fn-player-bar input {
+  width: 100%;
+  accent-color: var(--fn-accent);
+}
+
+.fn-viewer {
+  display: grid;
+  place-items: center;
+  min-height: 50vh;
+  padding: 16px;
+}
+
+.fn-viewer img {
+  max-width: 100%;
+  height: auto;
+}
+
 @keyframes fn-fade {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: none; }
@@ -769,7 +935,8 @@ textarea {
   .fn-month,
   .fn-fade,
   .fn-note-card,
-  .fn-sync::before {
+  .fn-sync::before,
+  .fn-rec-dot {
     animation: none !important;
     transition: none !important;
   }

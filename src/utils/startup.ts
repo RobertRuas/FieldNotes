@@ -1,8 +1,9 @@
-import { AttachmentService } from '@/services/AttachmentService';
-import { AudioService } from '@/services/AudioService';
 import { NotificationService } from '@/services/NotificationService';
 import { prepareNativeShell } from '@/services/platform/nativeShell';
 import { SyncService } from '@/services/SyncService';
+import { pumpTransfers } from '@/sync/fileQueue';
+import { useAttachmentsStore } from '@/stores/attachmentsStore';
+import { useAudioStore } from '@/stores/audioStore';
 import { useAuthStore } from '@/stores/authStore';
 import { useCollectionsStore } from '@/stores/collectionsStore';
 import { useDeviceStore } from '@/stores/deviceStore';
@@ -23,6 +24,8 @@ export async function startup(): Promise<void> {
     void useCollectionsStore().hydrate();
     void useNotificationStore().hydrate();
     void useSettingsStore().hydrate();
+    void useAttachmentsStore().hydrate();
+    void useAudioStore().hydrate();
   });
   await useSettingsStore().hydrate();
   await useAuthStore().hydrate();
@@ -33,11 +36,12 @@ export async function startup(): Promise<void> {
     useTasksStore().hydrate(),
     useCollectionsStore().hydrate(),
     useNotificationStore().hydrate(),
+    useAttachmentsStore().hydrate(),
+    useAudioStore().hydrate(),
   ]);
   SyncService.start();
   NotificationService.preparePush();
   await prepareNativeShell(resolveDark(useSettingsStore().theme));
-  // Anexos e áudio já têm persistência local; a captura fica para a fase seguinte.
-  void AttachmentService;
-  void AudioService;
+  // A fila de arquivo não espera a rede. Sem upload real, continua aguardando.
+  void pumpTransfers();
 }
