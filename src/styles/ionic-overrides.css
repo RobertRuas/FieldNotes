@@ -1,0 +1,110 @@
+ion-app.fn-app {
+  background:
+    radial-gradient(1100px 460px at 0% -10%, color-mix(in srgb, var(--fn-mark) 18%, transparent), transparent 55%),
+    radial-gradient(860px 420px at 100% 0%, color-mix(in srgb, var(--fn-accent) 16%, transparent), transparent 50%),
+    var(--fn-bg);
+}
+
+ion-header.fn-header ion-toolbar {
+  --background: var(--fn-bar);
+  --border-width: 0 0 0.5px;
+  --border-color: var(--fn-stroke);
+  --min-height: 52px;
+  backdrop-filter: saturate(1.4) blur(var(--fn-blur));
+  -webkit-backdrop-filter: saturate(1.4) blur(var(--fn-blur));
+}
+
+ion-tab-bar.fn-tabs {
+  --background: var(--fn-bar);
+  --border: 0.5px solid var(--fn-stroke);
+  backdrop-filter: saturate(1.4) blur(var(--fn-blur));
+  -webkit-backdrop-filter: saturate(1.4) blur(var(--fn-blur));
+}
+
+ion-tab-button {
+  min-height: 48px;
+  --padding-top: 6px;
+  --padding-bottom: 6px;
+}
+
+ion-tab-button ion-label {
+  font-size: var(--fn-text-xs);
+  letter-spacing: 0.01em;
+}
+
+ion-content.fn-page {
+  --background: transparent;
+  --padding-top: 8px;
+  --padding-bottom: 20px;
+  --padding-start: max(16px, env(safe-area-inset-left));
+  --padding-end: max(16px, env(safe-area-inset-right));
+}
+
+ion-button.fn-new-note {
+  --border-radius: 14px;
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  min-height: 48px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+ion-list.fn-inset {
+  background: var(--fn-surface);
+  border: 1px solid var(--fn-stroke);
+  border-radius: var(--fn-radius);
+  padding: 4px 0;
+  box-shadow: var(--fn-shadow-soft);
+}
+
+ion-item {
+  --background: transparent;
+  --color: var(--fn-ink);
+  --min-height: 48px;
+  --padding-start: 14px;
+  --inner-padding-end: 14px;
+}
+
+ion-toast {
+  --border-radius: 14px;
+  --background: var(--fn-ink);
+  --color: var(--fn-bg);
+  --offset-bottom: calc(72px + env(safe-area-inset-bottom));
+}
+
+ion-modal {
+  --border-radius: var(--fn-radius-lg);
+  --background: var(--fn-bg-elevated);
+  --color: var(--fn-ink);
+}
+
+ion-modal ion-toolbar {
+  --background: var(--fn-bg-elevated);
+}
+
+ion-input.fn-title-input {
+  --background: transparent;
+  --padding-start: 0;
+  --padding-end: 0;
+  --placeholder-color: var(--fn-ink-soft);
+  --placeholder-opacity: 0.7;
+  min-height: 48px;
+}
+
+ion-input.fn-title-input::part(native) {
+  font-family: var(--fn-font-note);
+  font-size: var(--fn-text-xl);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+}
+
+ion-textarea {
+  --background: var(--fn-bg-elevated);
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --border-radius: var(--fn-radius-sm);
+  border: 1px solid var(--fn-stroke);
+  border-radius: var(--fn-radius-sm);
+}

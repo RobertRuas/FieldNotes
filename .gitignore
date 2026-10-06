@@ -1,0 +1,15 @@
+node_modules
+dist
+dev-dist
+.vite
+*.tsbuildinfo
+.env
+.env.local
+.env.*.local
+.DS_Store
+*.log
+.ionic
+.capacitor
+ios
+android
+coverage

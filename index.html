@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="light" data-text-size="normal">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content"
+    />
+    <meta name="theme-color" content="#efece6" />
+    <meta name="color-scheme" content="light dark" />
+    <meta
+      name="description"
+      content="FieldNotes guarda notas de campo neste aparelho, mesmo sem rede."
+    />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="FieldNotes" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icons/icon-180.png" />
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)"
+      href="/splash/splash-1170x2532.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)"
+      href="/splash/splash-1284x2778.png"
+    />
+    <title>FieldNotes</title>
+    <script>
+      (function () {
+        try {
+          var theme = localStorage.getItem('fn-theme') || 'light';
+          var size = localStorage.getItem('fn-text-size') || 'normal';
+          if (theme !== 'light' && theme !== 'dark' && theme !== 'auto') theme = 'light';
+          var root = document.documentElement;
+          root.setAttribute('data-theme', theme);
+          root.setAttribute('data-text-size', size);
+          var dark =
+            theme === 'dark' ||
+            (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          root.classList.toggle('ion-palette-dark', dark);
+          root.style.colorScheme = dark ? 'dark' : 'light';
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.setAttribute('content', dark ? '#12161c' : '#efece6');
+        } catch (error) {
+          /* tema claro segue como padrão */
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <noscript>O FieldNotes precisa de JavaScript para abrir as notas neste aparelho.</noscript>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

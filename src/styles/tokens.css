@@ -1,0 +1,129 @@
+:root {
+  color-scheme: light;
+  --fn-bg: #efece6;
+  --fn-bg-elevated: #f7f4ee;
+  --fn-surface: rgba(255, 252, 247, 0.82);
+  --fn-bar: rgba(247, 244, 238, 0.78);
+  --fn-ink: #1a2330;
+  --fn-ink-soft: #5e6a78;
+  --fn-stroke: rgba(26, 35, 48, 0.1);
+  --fn-accent: #0e6b63;
+  --fn-accent-ink: #f7f4ee;
+  --fn-mark: #e07a3d;
+  --fn-danger: #9f2d24;
+  --fn-shadow: 0 10px 28px rgba(26, 35, 48, 0.08);
+  --fn-shadow-soft: 0 1px 2px rgba(26, 35, 48, 0.06);
+  --fn-blur: 22px;
+  --fn-radius-sm: 12px;
+  --fn-radius: 18px;
+  --fn-radius-lg: 26px;
+  --fn-space-1: 4px;
+  --fn-space-2: 8px;
+  --fn-space-3: 12px;
+  --fn-space-4: 16px;
+  --fn-space-5: 24px;
+  --fn-space-6: 32px;
+  --fn-font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --fn-font-note: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --fn-text-xs: 11px;
+  --fn-text-sm: 13px;
+  --fn-text-md: 16px;
+  --fn-text-lg: 20px;
+  --fn-text-xl: 28px;
+  --fn-note-size: 18px;
+  --fn-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --fn-motion: 320ms;
+  --ion-font-family: var(--fn-font-ui);
+  --ion-background-color: var(--fn-bg);
+  --ion-text-color: var(--fn-ink);
+  --ion-color-primary: #0e6b63;
+  --ion-color-primary-rgb: 14, 107, 99;
+  --ion-color-primary-contrast: #f7f4ee;
+  --ion-color-primary-contrast-rgb: 247, 244, 238;
+  --ion-color-primary-shade: #0c5e57;
+  --ion-color-primary-tint: #267a73;
+  --ion-color-danger: #9f2d24;
+  --ion-color-danger-rgb: 159, 45, 36;
+  --ion-color-danger-contrast: #fff8f6;
+  --ion-color-danger-contrast-rgb: 255, 248, 246;
+  --ion-color-danger-shade: #8c281f;
+  --ion-color-danger-tint: #a9423a;
+  --ion-toolbar-background: var(--fn-bar);
+  --ion-toolbar-color: var(--fn-ink);
+  --ion-tab-bar-background: var(--fn-bar);
+  --ion-tab-bar-color: var(--fn-ink-soft);
+  --ion-tab-bar-color-selected: var(--fn-accent);
+  --ion-item-background: transparent;
+  --ion-border-color: var(--fn-stroke);
+  --ion-placeholder-color: var(--fn-ink-soft);
+}
+
+:root[data-text-size='pequeno'] { --fn-note-size: 16px; }
+:root[data-text-size='normal'] { --fn-note-size: 18px; }
+:root[data-text-size='grande'] { --fn-note-size: 21px; }
+:root[data-text-size='muito-grande'] { --fn-note-size: 25px; }
+
+html.ion-palette-dark,
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --fn-bg: #12161c;
+  --fn-bg-elevated: #1b222c;
+  --fn-surface: rgba(32, 40, 52, 0.84);
+  --fn-bar: rgba(18, 22, 28, 0.8);
+  --fn-ink: #e8eef4;
+  --fn-ink-soft: #a3b0bf;
+  --fn-stroke: rgba(232, 238, 244, 0.12);
+  --fn-accent: #7dcec6;
+  --fn-accent-ink: #10211f;
+  --fn-mark: #e38a55;
+  --fn-danger: #ff8d84;
+  --fn-shadow: 0 14px 32px rgba(0, 0, 0, 0.35);
+  --fn-shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --ion-background-color: var(--fn-bg);
+  --ion-text-color: var(--fn-ink);
+  --ion-color-primary: #7dcec6;
+  --ion-color-primary-rgb: 125, 206, 198;
+  --ion-color-primary-contrast: #10211f;
+  --ion-color-primary-contrast-rgb: 16, 33, 31;
+  --ion-color-primary-shade: #6eb5ae;
+  --ion-color-primary-tint: #8ad3cc;
+  --ion-toolbar-background: var(--fn-bar);
+  --ion-toolbar-color: var(--fn-ink);
+  --ion-tab-bar-background: var(--fn-bar);
+  --ion-tab-bar-color: var(--fn-ink-soft);
+  --ion-tab-bar-color-selected: var(--fn-accent);
+  --ion-border-color: var(--fn-stroke);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme='auto'] {
+    color-scheme: dark;
+    --fn-bg: #12161c;
+    --fn-bg-elevated: #1b222c;
+    --fn-surface: rgba(32, 40, 52, 0.84);
+    --fn-bar: rgba(18, 22, 28, 0.8);
+    --fn-ink: #e8eef4;
+    --fn-ink-soft: #a3b0bf;
+    --fn-stroke: rgba(232, 238, 244, 0.12);
+    --fn-accent: #7dcec6;
+    --fn-accent-ink: #10211f;
+    --fn-mark: #e38a55;
+    --fn-danger: #ff8d84;
+    --fn-shadow: 0 14px 32px rgba(0, 0, 0, 0.35);
+    --fn-shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --ion-background-color: var(--fn-bg);
+    --ion-text-color: var(--fn-ink);
+    --ion-color-primary: #7dcec6;
+    --ion-color-primary-rgb: 125, 206, 198;
+    --ion-color-primary-contrast: #10211f;
+    --ion-color-primary-contrast-rgb: 16, 33, 31;
+    --ion-color-primary-shade: #6eb5ae;
+    --ion-color-primary-tint: #8ad3cc;
+    --ion-toolbar-background: var(--fn-bar);
+    --ion-toolbar-color: var(--fn-ink);
+    --ion-tab-bar-background: var(--fn-bar);
+    --ion-tab-bar-color: var(--fn-ink-soft);
+    --ion-tab-bar-color-selected: var(--fn-accent);
+    --ion-border-color: var(--fn-stroke);
+  }
+}
