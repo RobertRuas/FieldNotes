@@ -88,7 +88,7 @@ function setSize(size: ContentTextSize): void {
       </section>
       <section class="fn-section">
         <h2>Aparência</h2>
-        <ion-segment :value="settings.theme" aria-label="Aparência" @ionChange="onTheme">
+        <ion-segment :value="settings.theme" v-aria="'Aparência'" @ionChange="onTheme">
           <ion-segment-button v-for="theme in themes" :key="theme.id" :value="theme.id">
             <ion-label>{{ theme.label }}</ion-label>
           </ion-segment-button>
@@ -96,15 +96,14 @@ function setSize(size: ContentTextSize): void {
       </section>
       <section class="fn-section">
         <h2>Texto das notas</h2>
-        <ion-list class="fn-inset" lines="none" role="radiogroup" aria-label="Tamanho do texto das notas">
+        <ion-list class="fn-inset" lines="none" v-aria="{ label: 'Tamanho do texto das notas', role: 'radiogroup' }">
           <ion-item
             v-for="size in sizes"
             :key="size.id"
             button
             :detail="false"
             class="fn-choice"
-            role="radio"
-            :aria-checked="settings.contentTextSize === size.id"
+            v-aria="{ role: 'radio', checked: settings.contentTextSize === size.id }"
             @click="setSize(size.id)"
           >
             <ion-label>{{ size.label }}</ion-label>

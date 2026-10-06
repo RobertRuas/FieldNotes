@@ -70,5 +70,15 @@ export default defineConfig({
   build: {
     target: 'es2022',
     sourcemap: false,
+    // O helper de CommonJS do Vite ia parar no chunk da aplicação e o Ionic
+    // importava esse chunk de volta. Isso quebrava o boot em produção.
+    rollupOptions: {
+      output: {
+        manualChunks(id: string) {
+          if (id.includes('node_modules')) return 'vendor';
+          return undefined;
+        },
+      },
+    },
   },
 });

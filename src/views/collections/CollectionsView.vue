@@ -15,8 +15,8 @@ function onName(event: Event): void {
 
 async function add(): Promise<void> {
   const current = name.value;
-  name.value = '';
   await collections.add(current);
+  name.value = '';
 }
 </script>
 
@@ -35,7 +35,7 @@ async function add(): Promise<void> {
         <ion-input
           label="Nome da coleção"
           label-placement="stacked"
-          aria-label="Nome da coleção"
+          v-aria="'Nome da coleção'"
           placeholder="Ex.: Campo, ideias, visitas"
           :value="name"
           @ionInput="onName"
@@ -51,7 +51,7 @@ async function add(): Promise<void> {
         <ion-item v-for="item in collections.ordered" :key="item.id">
           <span slot="start" class="fn-swatch" :style="{ background: item.color }" aria-hidden="true" />
           <ion-label>{{ item.name }}</ion-label>
-          <ion-button slot="end" fill="clear" :aria-label="`Excluir ${item.name}`" @click="collections.remove(item.id)">
+          <ion-button slot="end" fill="clear" v-aria="`Excluir ${item.name}`" @click="collections.remove(item.id)">
             Excluir
           </ion-button>
         </ion-item>

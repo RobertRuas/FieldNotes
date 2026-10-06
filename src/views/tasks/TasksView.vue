@@ -32,9 +32,9 @@ function onDetail(event: Event): void {
 async function add(): Promise<void> {
   const current = title.value;
   const extra = detail.value;
+  await tasks.add(current, extra);
   title.value = '';
   detail.value = '';
-  await tasks.add(current, extra);
 }
 </script>
 
@@ -53,7 +53,7 @@ async function add(): Promise<void> {
         <ion-input
           label="Tarefa"
           label-placement="stacked"
-          aria-label="Tarefa"
+          v-aria="'Tarefa'"
           placeholder="O que precisa ser feito?"
           :value="title"
           @ionInput="onTitle"
@@ -61,7 +61,7 @@ async function add(): Promise<void> {
         <ion-textarea
           label="Detalhe"
           label-placement="stacked"
-          aria-label="Detalhe da tarefa"
+          v-aria="'Detalhe da tarefa'"
           placeholder="Opcional"
           :auto-grow="true"
           :rows="3"
@@ -87,7 +87,7 @@ async function add(): Promise<void> {
             <h2>{{ task.title }}</h2>
             <p v-if="task.detail">{{ task.detail }}</p>
           </ion-label>
-          <ion-button slot="end" fill="clear" aria-label="Excluir tarefa" @click="tasks.remove(task.id)">Excluir</ion-button>
+          <ion-button slot="end" fill="clear" v-aria="'Excluir tarefa'" @click="tasks.remove(task.id)">Excluir</ion-button>
         </ion-item>
       </ion-list>
     </ion-content>

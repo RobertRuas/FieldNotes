@@ -96,7 +96,11 @@ onMounted(() => {
             <img class="fn-mark-img" :src="markUrl" alt="" width="28" height="28" />
             <h1>Notas</h1>
           </div>
-          <ion-button fill="clear" :aria-label="viewLabel" :aria-pressed="notes.viewMode === 'list'" @click="toggleView">
+          <ion-button
+            fill="clear"
+            v-aria="{ label: viewLabel, pressed: notes.viewMode === 'list' }"
+            @click="toggleView"
+          >
             <ion-icon :icon="viewIcon" aria-hidden="true" />
           </ion-button>
         </div>

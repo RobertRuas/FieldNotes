@@ -324,7 +324,7 @@ onBeforeUnmount(() => {
         </ion-buttons>
         <ion-title>{{ dateLabel }}</ion-title>
         <ion-buttons slot="end">
-          <ion-button v-if="persisted" fill="clear" aria-label="Opções da nota" @click="sheetOpen = true">
+          <ion-button v-if="persisted" fill="clear" v-aria="'Opções da nota'" @click="sheetOpen = true">
             <ion-icon :icon="ellipsisHorizontal" aria-hidden="true" />
           </ion-button>
         </ion-buttons>
@@ -336,7 +336,7 @@ onBeforeUnmount(() => {
         <SyncStatus />
         <ion-input
           class="fn-title-input"
-          aria-label="Título"
+          v-aria="'Título'"
           placeholder="Título"
           :value="title"
           autocapitalize="sentences"
@@ -368,7 +368,7 @@ onBeforeUnmount(() => {
           <ion-input
             label="Endereço"
             label-placement="stacked"
-            aria-label="Endereço do link"
+            v-aria="'Endereço do link'"
             inputmode="url"
             :value="linkDraft"
             @ionInput="onLinkInput"

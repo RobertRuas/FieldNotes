@@ -5,6 +5,7 @@ import { registerSW } from 'virtual:pwa-register';
 import App from './App.vue';
 import router from './router';
 import { useSyncStore } from './stores/syncStore';
+import { vAria } from './utils/aria';
 import { startup } from './utils/startup';
 import '@ionic/vue/css/core.css';
 import '@ionic/vue/css/normalize.css';
@@ -26,6 +27,7 @@ const pinia = createPinia();
 app.use(pinia);
 app.use(IonicVue, { mode: 'ios' });
 app.use(router);
+app.directive('aria', vAria);
 
 async function boot(): Promise<void> {
   try {
