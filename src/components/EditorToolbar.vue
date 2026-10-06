@@ -11,7 +11,7 @@ const tools: { command: EditorCommand; label: string; text: string; serif?: bool
   { command: 'italic', label: 'Itálico', text: 'I', serif: true },
   { command: 'bullet', label: 'Lista', text: '•' },
   { command: 'ordered', label: 'Lista numerada', text: '1.' },
-  { command: 'check', label: 'Checklist', text: '☑' },
+  { command: 'check', label: 'Adicionar tarefa', text: '☑' },
 ];
 
 function hold(event: PointerEvent): void {

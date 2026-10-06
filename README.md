@@ -1,6 +1,6 @@
 # FieldNotes
 
-Notas de campo no aparelho, mesmo sem rede. A fase 1 é um PWA com Ionic Vue: o calendário da semana abre em primeiro, a nota é gravada no IndexedDB e a interface não espera a nuvem.
+Notas de campo no aparelho, mesmo sem rede. O calendário da semana abre em primeiro. Notas, coleções e tarefas são gravadas no IndexedDB e a interface não espera a nuvem.
 
 ## Requisitos
 
@@ -40,7 +40,9 @@ npm run preview
 ## O que funciona offline
 
 - Abrir o app depois do primeiro carregamento (service worker com cache do app shell)
-- Criar, editar e apagar notas, tarefas e coleções
+- Criar, editar e apagar notas
+- Coleções: criar, renomear e apagar. A coleção sai da lista; as notas e tarefas continuam, só sem esse vínculo. Uma nota cabe em uma coleção, e a coleção nunca é obrigatória
+- Tarefas com data, hora, prioridade e lembrete guardado. A mesma tarefa aparece na nota e na aba Tarefas. Concluir é imediato neste aparelho. O horário do lembrete fica gravado; o aviso do sistema ainda não é enviado
 - A nota aparece na hora; um debounce grava no IndexedDB e uma cópia imediata cobre o caso de fechar o app no meio da digitação
 - Calendário semanal (SEG–DOM), expansão do mês e lista por data
 - Tema claro, escuro ou automático, e tamanho do texto só do conteúdo da nota
@@ -56,8 +58,7 @@ O mesmo build da PWA é o app. Plugins preparados: Camera, Filesystem, Push Noti
 
 ## Próxima fase
 
-- Esquema Supabase com RLS e autenticação de verdade
-- Envio da fila e pull entre aparelhos
-- Fotos, documentos, áudio e tarefas dentro da nota
+- Fotos, documentos e áudio
+- Sincronização de verdade com Supabase: esquema, RLS, autenticação, envio da fila e pull entre aparelhos
 - Permissão de push e lembretes do sistema
 - Projeto nativo Capacitor usando este `dist/`

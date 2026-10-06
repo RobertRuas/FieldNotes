@@ -38,6 +38,11 @@ db.version(1).stores({
   devices: 'id, userId, platform, updatedAt, syncStatus',
 });
 
+// Índices novos da tarefa. Os outros stores continuam da versão 1.
+db.version(2).stores({
+  tasks: 'id, userId, noteId, collectionId, done, date, updatedAt, deletedAt, syncStatus',
+});
+
 export async function openDatabase(): Promise<void> {
   await db.open();
 }

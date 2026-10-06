@@ -17,7 +17,9 @@ import type {
   ThemeMode,
   User,
 } from '@/types/entities';
+import { isDateKey, isTimeKey } from '@/utils/dates';
 import { isRecord } from '@/utils/guards';
+import { isPriority, normalizeTask } from '@/utils/tasks';
 
 export type ParsedEntity =
   | { entity: 'users'; record: User }
@@ -104,6 +106,23 @@ function amount(row: Record<string, unknown>, key: string): number | null {
   return typeof value === 'number' && Number.isFinite(value) ? value : null;
 }
 
+function optionalDate(row: Record<string, unknown>, key: string): string | null | undefined {
+  if (!(key in row) || row[key] == null) return null;
+  const value = row[key];
+  return typeof value === 'string' && isDateKey(value) ? value : undefined;
+}
+
+function optionalClock(row: Record<string, unknown>, key: string): string | null | undefined {
+  if (!(key in row) || row[key] == null) return null;
+  const value = row[key];
+  return typeof value === 'string' && isTimeKey(value) ? value : undefined;
+}
+
+function optionalPriority(row: Record<string, unknown>): Task['priority'] | undefined {
+  if (!('priority' in row) || row.priority == null) return null;
+  return isPriority(row.priority) ? row.priority : undefined;
+}
+
 function oneOf<T extends string>(value: unknown, options: readonly T[]): T | null {
   if (typeof value !== 'string') return null;
   return options.find((option) => option === value) ?? null;
@@ -168,9 +187,32 @@ export function parseEntity(entity: SyncEntityName, value: unknown): ParsedEntit
       const detail = text(camel, 'detail') ?? '';
       const done = flag(camel, 'done');
       const noteId = optionalText(camel, 'noteId', null);
+      const collectionId = optionalText(camel, 'collectionId', null);
       const dueAt = optionalText(camel, 'dueAt', null);
-      if (!userId || title === null || done === null || noteId === undefined || dueAt === undefined) return null;
-      return { entity, record: { ...base, userId, noteId, title, detail, done, dueAt } };
+      const date = optionalDate(camel, 'date');
+      const time = optionalClock(camel, 'time');
+      const reminderAt = optionalText(camel, 'reminderAt', null);
+      const priority = optionalPriority(camel);
+      if (!userId || title === null || done === null) return null;
+      if (noteId === undefined || collectionId === undefined || dueAt === undefined || reminderAt === undefined) return null;
+      if (date === undefined || time === undefined || priority === undefined) return null;
+      return {
+        entity,
+        record: normalizeTask({
+          ...base,
+          userId,
+          noteId,
+          collectionId,
+          title,
+          detail,
+          done,
+          date,
+          time,
+          priority,
+          reminderAt,
+          dueAt,
+        }),
+      };
     }
     case 'attachments': {
       const userId = text(camel, 'userId');

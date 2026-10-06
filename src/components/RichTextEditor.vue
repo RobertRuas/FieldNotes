@@ -41,13 +41,6 @@ function exec(command: string, value?: string): void {
   publish();
 }
 
-function insertChecklist(): void {
-  exec(
-    'insertHTML',
-    '<ul class="fn-check"><li data-check="1" role="checkbox" aria-checked="false"><span data-box="1" contenteditable="false"></span>&#8203;</li></ul>',
-  );
-}
-
 const api: EditorApi = {
   focus() {
     root.value?.focus();
@@ -57,11 +50,12 @@ const api: EditorApi = {
     saved = selection && selection.rangeCount > 0 ? selection.getRangeAt(0).cloneRange() : null;
   },
   run(command: EditorCommand) {
+    // Checklist da nota é um registro de tarefa, não uma lista no texto.
+    if (command === 'check') return;
     if (command === 'bold') exec('bold');
     else if (command === 'italic') exec('italic');
     else if (command === 'bullet') exec('insertUnorderedList');
     else if (command === 'ordered') exec('insertOrderedList');
-    else insertChecklist();
   },
   insertLink(url: string) {
     const selection = window.getSelection();

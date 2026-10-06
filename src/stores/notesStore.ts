@@ -32,7 +32,7 @@ export const useNotesStore = defineStore('notesStore', () => {
     return notes.value.find((note) => note.id === id) ?? NoteService.get(id);
   }
 
-  async function save(note: Note): Promise<void> {
+  async function save(note: Note, quiet = false): Promise<void> {
     const previous = notes.value.find((item) => item.id === note.id) ?? null;
     const index = notes.value.findIndex((item) => item.id === note.id);
     if (index === -1) notes.value.unshift(note);
@@ -48,9 +48,15 @@ export const useNotesStore = defineStore('notesStore', () => {
       } else {
         notes.value = notes.value.filter((item) => item.id !== note.id);
       }
-      pushToast('Não foi possível salvar neste aparelho.');
+      if (!quiet) pushToast('Não foi possível salvar neste aparelho.');
       throw new Error('falha-local');
     }
+  }
+
+  function inCollection(collectionId: string): Note[] {
+    return notes.value
+      .filter((note) => note.collectionId === collectionId)
+      .sort((left, right) => (left.updatedAt < right.updatedAt ? 1 : -1));
   }
 
   async function remove(id: string): Promise<void> {
@@ -82,6 +88,7 @@ export const useNotesStore = defineStore('notesStore', () => {
     viewMode,
     listRows,
     notesOn,
+    inCollection,
     hydrate,
     find,
     save,

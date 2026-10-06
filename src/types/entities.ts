@@ -53,12 +53,20 @@ export interface Note extends EntityMeta {
   reminderAt: string | null;
 }
 
+export type TaskPriority = 'baixa' | 'normal' | 'alta';
+
 export interface Task extends EntityMeta {
   userId: string;
   noteId: string | null;
+  collectionId: string | null;
   title: string;
   detail: string;
+  /** `done` é a conclusão. O lembrete só fica gravado; nada é agendado no sistema. */
   done: boolean;
+  date: string | null;
+  time: string | null;
+  priority: TaskPriority | null;
+  reminderAt: string | null;
   dueAt: string | null;
 }
 

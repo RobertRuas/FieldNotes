@@ -17,6 +17,7 @@ import {
 } from '@ionic/vue';
 import { ellipsisHorizontal } from 'ionicons/icons';
 import EditorToolbar from '@/components/EditorToolbar.vue';
+import NoteTaskList from '@/components/NoteTaskList.vue';
 import RichTextEditor from '@/components/RichTextEditor.vue';
 import SyncStatus from '@/components/SyncStatus.vue';
 import { editorKey, type EditorApi, type EditorCommand } from '@/composables/editorContext';
@@ -25,6 +26,7 @@ import { useKeyboardInset } from '@/composables/useKeyboardInset';
 import { useAuthStore } from '@/stores/authStore';
 import { useCollectionsStore } from '@/stores/collectionsStore';
 import { useNotesStore } from '@/stores/notesStore';
+import { useTasksStore } from '@/stores/tasksStore';
 import type { Note } from '@/types/entities';
 import {
   fromLocalDateTimeInput,
@@ -52,6 +54,7 @@ const router = useRouter();
 const auth = useAuthStore();
 const notes = useNotesStore();
 const collections = useCollectionsStore();
+const tasks = useTasksStore();
 const keyboard = useKeyboardInset();
 const editorApi = ref<EditorApi | null>(null);
 provide(editorKey, editorApi);
@@ -67,7 +70,7 @@ const attachments = ref<string[]>([]);
 const photos = ref<string[]>([]);
 const documents = ref<string[]>([]);
 const audio = ref<string[]>([]);
-const taskIds = ref<string[]>([]);
+const taskList = ref<{ focusNew: () => Promise<void> } | null>(null);
 const persisted = ref(false);
 const missing = ref(false);
 const revision = ref(0);
@@ -79,6 +82,9 @@ const reminderOpen = ref(false);
 const reminderDraft = ref('');
 const sheetOpen = ref(false);
 const collectionOpen = ref(false);
+const creatingCollection = ref(false);
+const newCollectionOpen = ref(false);
+const newCollectionName = ref('');
 
 const normalizedLink = computed(() => normalizeUrl(linkDraft.value));
 const linkHint = computed(() =>
@@ -107,6 +113,12 @@ const collectionButtons = computed<SheetButton[]>(() => [
     },
   })),
   {
+    text: 'Nova coleção',
+    handler: () => {
+      creatingCollection.value = true;
+    },
+  },
+  {
     text: 'Sem coleção',
     handler: () => {
       collectionId.value = null;
@@ -117,7 +129,12 @@ const collectionButtons = computed<SheetButton[]>(() => [
 ]);
 
 function shouldPersist(): boolean {
-  return hasVisibleContent(title.value, text.value) || collectionId.value !== null || reminderAt.value !== null;
+  return (
+    hasVisibleContent(title.value, text.value) ||
+    collectionId.value !== null ||
+    reminderAt.value !== null ||
+    tasks.forNote(noteIdRef.value).length > 0
+  );
 }
 
 function snapshot(userId: string): Note {
@@ -133,7 +150,7 @@ function snapshot(userId: string): Note {
     photos: [...photos.value],
     documents: [...documents.value],
     audio: [...audio.value],
-    tasks: [...taskIds.value],
+    tasks: tasks.forNote(noteIdRef.value).map((task) => task.id),
     createdAt: createdAtRef.value,
     updatedAt: nowIso(),
     deletedAt: null,
@@ -207,7 +224,6 @@ async function load(id: string): Promise<void> {
   photos.value = [...note.photos];
   documents.value = [...note.documents];
   audio.value = [...note.audio];
-  taskIds.value = [...note.tasks];
   revision.value += 1;
 }
 
@@ -228,6 +244,11 @@ function onText(value: string): void {
 }
 
 function onCommand(command: EditorCommand): void {
+  // O checklist abre a tarefa de verdade, o mesmo registro da aba Tarefas.
+  if (command === 'check') {
+    void taskList.value?.focusNew();
+    return;
+  }
   editorApi.value?.run(command);
 }
 
@@ -269,6 +290,27 @@ function clearReminder(): void {
   reminderAt.value = null;
   reminderDraft.value = '';
   reminderOpen.value = false;
+  touch();
+}
+
+function onCollectionName(event: Event): void {
+  newCollectionName.value = readIonText(event);
+}
+
+function onCollectionDismiss(): void {
+  collectionOpen.value = false;
+  if (!creatingCollection.value) return;
+  creatingCollection.value = false;
+  newCollectionName.value = '';
+  newCollectionOpen.value = true;
+}
+
+async function confirmNewCollection(): Promise<void> {
+  const created = await collections.add(newCollectionName.value);
+  newCollectionOpen.value = false;
+  newCollectionName.value = '';
+  if (!created) return;
+  collectionId.value = created.id;
   touch();
 }
 
@@ -348,7 +390,15 @@ onBeforeUnmount(() => {
           <button type="button" class="fn-chip" @click="openReminder">{{ reminderText }}</button>
         </div>
         <RichTextEditor :model-value="text" :revision="revision" @update:model-value="onText" />
-        <p class="fn-later">Fotos, documentos, áudio e tarefas da nota ficam para a próxima versão.</p>
+        <NoteTaskList
+          v-if="noteIdRef"
+          ref="taskList"
+          :note-id="noteIdRef"
+          :collection-id="collectionId"
+          :date="dateKey"
+          @changed="touch"
+        />
+        <p class="fn-later">Fotos, documentos e áudio ficam para a próxima versão.</p>
       </template>
     </ion-content>
     <ion-footer v-if="!missing" class="fn-dock" :style="dockStyle">
@@ -412,7 +462,31 @@ onBeforeUnmount(() => {
       :is-open="collectionOpen"
       header="Coleção"
       :buttons="collectionButtons"
-      @didDismiss="collectionOpen = false"
+      @didDismiss="onCollectionDismiss"
     />
+    <ion-modal :is-open="newCollectionOpen" @didDismiss="newCollectionOpen = false">
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Nova coleção</ion-title>
+          <ion-buttons slot="end">
+            <ion-button @click="newCollectionOpen = false">Fechar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <form class="fn-modal-body" @submit.prevent="confirmNewCollection">
+          <ion-input
+            label="Nome"
+            label-placement="stacked"
+            v-aria="'Nome da nova coleção'"
+            :value="newCollectionName"
+            @ionInput="onCollectionName"
+          />
+          <ion-button type="submit" expand="block" :disabled="newCollectionName.trim().length === 0">
+            Criar coleção
+          </ion-button>
+        </form>
+      </ion-content>
+    </ion-modal>
   </ion-page>
 </template>

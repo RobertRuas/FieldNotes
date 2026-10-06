@@ -132,8 +132,8 @@ textarea {
 .fn-day,
 .fn-month-day,
 .fn-handle,
-.fn-note-card,
-.fn-list-row,
+.fn-note-hit,
+.fn-list-hit,
 .fn-tool,
 .fn-checkhit {
   min-height: 44px;
@@ -145,8 +145,10 @@ textarea {
 .fn-handle,
 .fn-tool,
 .fn-checkhit,
-.fn-list-row,
-.fn-note-card,
+.fn-list-hit,
+.fn-note-hit,
+.fn-collection-hit,
+.fn-task-copy,
 .fn-day,
 .fn-month-day {
   border: 0;
@@ -323,29 +325,42 @@ textarea {
 }
 
 .fn-note-card {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 2px 12px;
-  padding: 14px 14px 14px 12px;
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  width: 100%;
+  padding: 8px 8px 8px 12px;
   border-left: 3px solid var(--card-accent, transparent);
 }
 
-.fn-note-card time,
-.fn-list-row time {
+.fn-note-hit {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 12px;
+  flex: 1;
+  min-width: 0;
+  padding: 6px 4px;
+  text-align: left;
+}
+
+.fn-note-hit time,
+.fn-list-hit time {
   font-variant-numeric: tabular-nums;
   color: var(--fn-accent);
   font-size: var(--fn-text-sm);
   font-weight: 650;
 }
 
-.fn-note-card strong,
-.fn-list-row span {
+.fn-note-hit strong,
+.fn-list-hit span,
+.fn-task-copy strong,
+.fn-collection-copy strong {
   font-size: var(--fn-text-md);
   font-weight: 600;
   letter-spacing: -0.02em;
 }
 
-.fn-note-card p {
+.fn-note-hit p {
   grid-column: 2;
   margin: 0;
   color: var(--fn-ink-soft);
@@ -357,7 +372,7 @@ textarea {
   overflow: hidden;
 }
 
-.fn-note-card small {
+.fn-note-hit small {
   grid-column: 2;
   color: var(--fn-mark);
   font-size: var(--fn-text-xs);
@@ -397,8 +412,9 @@ textarea {
 .fn-list-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 4px;
   width: 100%;
+  height: 100%;
   margin: 0;
   padding: 0 4px;
   box-sizing: border-box;
@@ -406,12 +422,22 @@ textarea {
   text-align: left;
 }
 
-.fn-list-row time {
+.fn-list-hit {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.fn-list-hit time {
   width: 52px;
   flex: none;
 }
 
-.fn-list-row span {
+.fn-list-hit span {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -595,6 +621,121 @@ textarea {
   margin-top: 18px;
 }
 
+.fn-row-host,
+.fn-slide {
+  width: 100%;
+}
+
+.fn-stack {
+  display: grid;
+  gap: 10px;
+}
+
+.fn-suggest {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.fn-collection-card {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  padding: 8px 8px 8px 12px;
+  background: var(--fn-surface);
+  border: 1px solid var(--fn-stroke);
+  border-radius: var(--fn-radius);
+  box-shadow: var(--fn-shadow-soft);
+}
+
+.fn-collection-hit {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.fn-collection-copy {
+  display: grid;
+  min-width: 0;
+}
+
+.fn-collection-copy small,
+.fn-task-copy small {
+  color: var(--fn-ink-soft);
+  font-size: var(--fn-text-xs);
+}
+
+.fn-task-line {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.fn-task-copy {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  padding: 6px 0;
+  text-align: left;
+}
+
+.fn-task-copy strong,
+.fn-task-line span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fn-task-done {
+  color: var(--fn-ink-soft);
+  text-decoration: line-through;
+}
+
+.fn-note-tasks {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.fn-note-tasks h2 {
+  margin: 0;
+  font-size: var(--fn-text-sm);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fn-ink-soft);
+}
+
+.fn-task-stack,
+.fn-task-add {
+  display: grid;
+  gap: 8px;
+}
+
+.fn-priority {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fn-chip[aria-pressed='true'] {
+  border-color: var(--fn-accent);
+  background: color-mix(in srgb, var(--fn-accent) 14%, var(--fn-surface));
+}
+
+.fn-field {
+  display: grid;
+  gap: 6px;
+  color: var(--fn-ink-soft);
+  font-size: var(--fn-text-sm);
+}
+
 .fn-modal-body {
   display: grid;
   gap: 14px;
@@ -634,12 +775,16 @@ textarea {
   }
 }
 
-.fn-note-card:active {
+.fn-note-hit:active,
+.fn-collection-hit:active,
+.fn-task-copy:active {
   transform: scale(0.985);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fn-note-card:active {
+  .fn-note-hit:active,
+  .fn-collection-hit:active,
+  .fn-task-copy:active {
     transform: none;
   }
 }

@@ -18,7 +18,7 @@ export function buildNoteRows(notes: readonly Note[], today: string): NoteListRo
     rows.push({ kind: 'header', key: `h-${date}`, height: 36, label: groupLabel(date, today) });
     const items = [...(groups.get(date) ?? [])].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
     for (const note of items) {
-      rows.push({ kind: 'note', key: note.id, height: 56, note });
+      rows.push({ kind: 'note', key: note.id, height: 72, note });
     }
   }
   return rows;

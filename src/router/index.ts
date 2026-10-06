@@ -10,6 +10,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'notas', name: 'notas', component: () => import('@/views/notes/NotesHome.vue') },
       { path: 'tarefas', name: 'tarefas', component: () => import('@/views/tasks/TasksView.vue') },
       { path: 'colecoes', name: 'colecoes', component: () => import('@/views/collections/CollectionsView.vue') },
+      { path: 'colecoes/:collectionId', name: 'colecao', component: () => import('@/views/collections/CollectionDetail.vue') },
       { path: 'configuracoes', name: 'configuracoes', component: () => import('@/views/settings/SettingsView.vue') },
     ],
   },

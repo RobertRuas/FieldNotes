@@ -1,40 +1,49 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import {
   IonButton,
+  IonButtons,
   IonContent,
   IonHeader,
   IonInput,
-  IonItem,
-  IonLabel,
-  IonList,
+  IonModal,
   IonPage,
-  IonTextarea,
+  IonTitle,
   IonToolbar,
 } from '@ionic/vue';
 import EmptyState from '@/components/EmptyState.vue';
 import SyncStatus from '@/components/SyncStatus.vue';
+import TaskForm from '@/components/TaskForm.vue';
+import TaskRow from '@/components/TaskRow.vue';
 import { useTasksStore } from '@/stores/tasksStore';
+import { todayKey } from '@/utils/dates';
 import { readIonText } from '@/utils/ionic';
+import { doneTasks, openTaskSections } from '@/utils/tasks';
 
+const router = useRouter();
 const tasks = useTasksStore();
 const title = ref('');
-const detail = ref('');
+const editing = ref<string | null>(null);
+const today = todayKey();
+
+const openSections = computed(() => openTaskSections(tasks.tasks, today));
+const finished = computed(() => doneTasks(tasks.tasks));
+const empty = computed(() => tasks.tasks.length === 0);
 
 function onTitle(event: Event): void {
   title.value = readIonText(event);
 }
 
-function onDetail(event: Event): void {
-  detail.value = readIonText(event);
+async function add(): Promise<void> {
+  const created = await tasks.add({ title: title.value });
+  if (!created) return;
+  title.value = '';
+  editing.value = created.id;
 }
 
-async function add(): Promise<void> {
-  const current = title.value;
-  const extra = detail.value;
-  await tasks.add(current, extra);
-  title.value = '';
-  detail.value = '';
+function openNote(id: string): void {
+  void router.push({ name: 'editor', params: { noteId: id } });
 }
 </script>
 
@@ -53,43 +62,53 @@ async function add(): Promise<void> {
         <ion-input
           label="Tarefa"
           label-placement="stacked"
-          v-aria="'Tarefa'"
+          v-aria="'Nova tarefa'"
           placeholder="O que precisa ser feito?"
           :value="title"
           @ionInput="onTitle"
         />
-        <ion-textarea
-          label="Detalhe"
-          label-placement="stacked"
-          v-aria="'Detalhe da tarefa'"
-          placeholder="Opcional"
-          :auto-grow="true"
-          :rows="3"
-          :value="detail"
-          @ionInput="onDetail"
-        />
         <ion-button type="submit" expand="block" :disabled="title.trim().length === 0">Adicionar</ion-button>
       </form>
-      <EmptyState v-if="tasks.ordered.length === 0" title="Nenhuma tarefa ainda" body="As tarefas ficam neste aparelho." />
-      <ion-list v-else class="fn-inset" lines="none">
-        <ion-item v-for="task in tasks.ordered" :key="task.id">
-          <button
-            slot="start"
-            type="button"
-            class="fn-checkhit"
-            :aria-pressed="task.done"
-            :aria-label="task.done ? 'Marcar como pendente' : 'Marcar como feita'"
-            @click="tasks.toggle(task.id)"
-          >
-            <i />
-          </button>
-          <ion-label>
-            <h2>{{ task.title }}</h2>
-            <p v-if="task.detail">{{ task.detail }}</p>
-          </ion-label>
-          <ion-button slot="end" fill="clear" v-aria="'Excluir tarefa'" @click="tasks.remove(task.id)">Excluir</ion-button>
-        </ion-item>
-      </ion-list>
+      <EmptyState
+        v-if="empty"
+        title="Nenhuma tarefa ainda"
+        body="Uma tarefa fica neste aparelho na hora. O lembrete é só um horário guardado."
+      />
+      <template v-else>
+        <section v-for="section in openSections" :key="section.id" class="fn-section">
+          <h2>{{ section.title }}</h2>
+          <TaskRow
+            v-for="task in section.tasks"
+            :key="task.id"
+            :task="task"
+            @edit="editing = $event"
+            @open-note="openNote"
+          />
+        </section>
+        <section v-if="finished.length > 0" class="fn-section">
+          <h2>Feitas</h2>
+          <TaskRow
+            v-for="task in finished"
+            :key="task.id"
+            :task="task"
+            @edit="editing = $event"
+            @open-note="openNote"
+          />
+        </section>
+      </template>
     </ion-content>
+    <ion-modal :is-open="editing !== null" @didDismiss="editing = null">
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Tarefa</ion-title>
+          <ion-buttons slot="end">
+            <ion-button @click="editing = null">Fechar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <TaskForm v-if="editing" :task-id="editing" @close="editing = null" />
+      </ion-content>
+    </ion-modal>
   </ion-page>
 </template>

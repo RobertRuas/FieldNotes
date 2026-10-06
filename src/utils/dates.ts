@@ -16,6 +16,7 @@ const MONTHS = [
 ] as const;
 
 const DATE_KEY = /^(\d{4})-(\d{2})-(\d{2})$/;
+const TIME_KEY = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
 export function toDateKey(date: Date): string {
   const year = date.getFullYear();
@@ -39,6 +40,10 @@ export function parseDateKey(key: string): Date {
 export function isDateKey(value: string): boolean {
   if (!DATE_KEY.test(value)) return false;
   return toDateKey(parseDateKey(value)) === value;
+}
+
+export function isTimeKey(value: string): boolean {
+  return TIME_KEY.test(value);
 }
 
 export function addDays(key: string, days: number): string {
