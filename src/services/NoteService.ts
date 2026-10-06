@@ -7,10 +7,16 @@ import { sanitizeNoteHtml } from '@/utils/html';
 import { hasVisibleContent } from '@/utils/text';
 
 function cleanNote(note: Note): Note {
+  // Arrays do Pinia são proxies. O IndexedDB não clona proxy, então a cópia é simples.
   return {
     ...note,
     title: note.title.trim().slice(0, 200),
     text: sanitizeNoteHtml(note.text).slice(0, 200_000),
+    attachments: [...note.attachments],
+    photos: [...note.photos],
+    documents: [...note.documents],
+    audio: [...note.audio],
+    tasks: [...note.tasks],
     syncStatus: 'pending',
   };
 }
