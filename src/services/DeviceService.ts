@@ -25,7 +25,7 @@ export const DeviceService = {
     const existingId = await preferenceGet(DEVICE_KEY);
     if (existingId) {
       const row = await db.devices.get(existingId);
-      if (row && row.deletedAt === null) return row;
+      if (row && row.deletedAt === null && row.userId === userId) return row;
     }
     const now = nowIso();
     const platform = currentPlatform();
@@ -43,5 +43,13 @@ export const DeviceService = {
     await enqueueWrite(db.devices, 'devices', device, 'upsert');
     await preferenceSet(DEVICE_KEY, device.id);
     return device;
+  },
+
+  async rememberPushToken(userId: string, pushToken: string): Promise<Device> {
+    const device = await this.ensureDevice(userId);
+    if (device.pushToken === pushToken) return device;
+    const next: Device = { ...device, pushToken, updatedAt: nowIso(), syncStatus: 'pending' };
+    await enqueueWrite(db.devices, 'devices', next, 'upsert');
+    return next;
   },
 };

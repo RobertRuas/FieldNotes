@@ -88,7 +88,7 @@ function back(): void {
 
 <template>
   <ion-page>
-    <ion-header class="fn-header" translucent>
+    <ion-header class="fn-header">
       <ion-toolbar>
         <ion-buttons slot="start">
           <ion-button fill="clear" @click="back">Coleções</ion-button>

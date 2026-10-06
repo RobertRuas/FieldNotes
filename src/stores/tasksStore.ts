@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
+import { NotificationService } from '@/services/NotificationService';
 import { hapticLight } from '@/services/platform/haptics';
 import { TaskService } from '@/services/TaskService';
 import { useAuthStore } from '@/stores/authStore';
@@ -65,6 +66,7 @@ export const useTasksStore = defineStore('tasksStore', () => {
     tasks.value.unshift(task);
     try {
       await TaskService.persist(task);
+      await NotificationService.syncTaskReminder(task);
       return task;
     } catch {
       tasks.value = tasks.value.filter((item) => item.id !== task.id);
@@ -81,6 +83,7 @@ export const useTasksStore = defineStore('tasksStore', () => {
     else tasks.value[index] = next;
     try {
       await TaskService.persist(next);
+      await NotificationService.syncTaskReminder(next);
     } catch {
       if (previous) {
         const at = tasks.value.findIndex((item) => item.id === next.id);
@@ -109,6 +112,7 @@ export const useTasksStore = defineStore('tasksStore', () => {
     if (index >= 0) tasks.value[index] = next;
     try {
       await TaskService.persist(next);
+      await NotificationService.syncTaskReminder(next);
     } catch {
       if (index >= 0) tasks.value[index] = current;
       pushToast('Não foi possível salvar neste aparelho.');
@@ -122,6 +126,7 @@ export const useTasksStore = defineStore('tasksStore', () => {
     tasks.value = tasks.value.filter((item) => item.id !== id);
     try {
       await TaskService.persist(next);
+      await NotificationService.syncTaskReminder(next);
     } catch {
       tasks.value.unshift(current);
       pushToast('Não foi possível salvar neste aparelho.');

@@ -86,12 +86,28 @@ export async function applyRemoteRecord(parsed: ParsedEntity): Promise<'applied'
     case 'tasks':
       await db.tasks.put({ ...parsed.record, syncStatus: 'synced' });
       break;
-    case 'attachments':
-      await db.attachments.put({ ...parsed.record, syncStatus: 'synced' });
+    case 'attachments': {
+      const previous = await db.attachments.get(parsed.record.id);
+      const stored = previous?.localUri ?? null;
+      const keep = stored?.startsWith('local:') || stored?.startsWith('fs:');
+      await db.attachments.put({
+        ...parsed.record,
+        localUri: keep ? stored : parsed.record.localUri,
+        syncStatus: 'synced',
+      });
       break;
-    case 'audio_recordings':
-      await db.audio_recordings.put({ ...parsed.record, syncStatus: 'synced' });
+    }
+    case 'audio_recordings': {
+      const previous = await db.audio_recordings.get(parsed.record.id);
+      const stored = previous?.localUri ?? null;
+      const keep = stored?.startsWith('local:') || stored?.startsWith('fs:');
+      await db.audio_recordings.put({
+        ...parsed.record,
+        localUri: keep ? stored : parsed.record.localUri,
+        syncStatus: 'synced',
+      });
       break;
+    }
     case 'notifications':
       await db.notifications.put({ ...parsed.record, syncStatus: 'synced' });
       break;

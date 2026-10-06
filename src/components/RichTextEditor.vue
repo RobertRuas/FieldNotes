@@ -20,7 +20,7 @@ function publish(): void {
   if (writing || !root.value) return;
   empty.value = htmlToPlain(root.value.innerHTML).length === 0;
   emit('update:modelValue', root.value.innerHTML);
-  keepCaret();
+  void keepCaret();
 }
 
 function fill(html: string): void {
@@ -54,6 +54,7 @@ const api: EditorApi = {
     if (command === 'check') return;
     if (command === 'bold') exec('bold');
     else if (command === 'italic') exec('italic');
+    else if (command === 'underline') exec('underline');
     else if (command === 'bullet') exec('insertUnorderedList');
     else if (command === 'ordered') exec('insertOrderedList');
   },
@@ -88,17 +89,26 @@ function onPointerDown(event: PointerEvent): void {
   publish();
 }
 
-function keepCaret(): void {
+async function keepCaret(): Promise<void> {
+  const field = root.value;
   const selection = window.getSelection();
-  if (!root.value || !selection || selection.rangeCount === 0) return;
-  if (!root.value.contains(selection.anchorNode)) return;
+  if (!field || !selection || selection.rangeCount === 0) return;
+  if (!field.contains(selection.anchorNode)) return;
   const rect = selection.getRangeAt(0).getBoundingClientRect();
-  const viewport = window.visualViewport;
-  const bottom = (viewport ? viewport.offsetTop + viewport.height : window.innerHeight) - 88;
-  if (rect.bottom > bottom) {
-    const node = selection.anchorNode instanceof Element ? selection.anchorNode : selection.anchorNode?.parentElement;
-    node?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
-  }
+  if (rect.height === 0 && rect.top === 0) return;
+  const host = field.closest('ion-content');
+  if (!host || !('getScrollElement' in host)) return;
+  const scroll = await (host as HTMLElement & { getScrollElement: () => Promise<HTMLElement> }).getScrollElement();
+  const header = document.querySelector('ion-header');
+  const dock = document.querySelector('ion-footer.fn-dock');
+  const topLimit = (header?.getBoundingClientRect().bottom ?? 0) + 12;
+  const bottomLimit = (dock?.getBoundingClientRect().top ?? window.innerHeight) - 12;
+  if (rect.top < topLimit) scroll.scrollTop -= topLimit - rect.top;
+  else if (rect.bottom > bottomLimit) scroll.scrollTop += rect.bottom - bottomLimit;
+}
+
+function onViewport(): void {
+  void keepCaret();
 }
 
 watch(
@@ -113,12 +123,14 @@ onMounted(() => {
   doc.execCommand('defaultParagraphSeparator', false, 'p');
   fill(props.modelValue);
   if (slot) slot.value = api;
-  window.visualViewport?.addEventListener('resize', keepCaret);
+  window.visualViewport?.addEventListener('resize', onViewport);
+  window.visualViewport?.addEventListener('scroll', onViewport);
 });
 
 onBeforeUnmount(() => {
   if (slot) slot.value = null;
-  window.visualViewport?.removeEventListener('resize', keepCaret);
+  window.visualViewport?.removeEventListener('resize', onViewport);
+  window.visualViewport?.removeEventListener('scroll', onViewport);
 });
 </script>
 
@@ -136,6 +148,7 @@ onBeforeUnmount(() => {
     lang="pt-BR"
     autocapitalize="sentences"
     @input="publish"
+    @focus="keepCaret"
     @paste="onPaste"
     @pointerdown="onPointerDown"
   />

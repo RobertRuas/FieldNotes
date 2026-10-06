@@ -6,7 +6,7 @@ import { useAttachmentsStore } from '@/stores/attachmentsStore';
 import { visibleTransfer } from '@/sync/fileQueue';
 import { fileSizeLabel } from '@/utils/files';
 
-const props = defineProps<{ noteId: string }>();
+const props = defineProps<{ noteId: string; bare?: boolean }>();
 const emit = defineEmits<{ changed: [] }>();
 const attachments = useAttachmentsStore();
 const picker = ref<HTMLInputElement | null>(null);
@@ -33,9 +33,9 @@ async function remove(id: string): Promise<void> {
 </script>
 
 <template>
-  <section class="fn-media" aria-label="Documentos">
-    <h2>Documentos</h2>
-    <ion-button size="small" fill="outline" @click="picker?.click()">Anexar arquivo</ion-button>
+  <section v-if="!bare || files.length > 0" class="fn-media" :class="{ 'is-bare': bare }" aria-label="Documentos">
+    <h2 v-if="!bare">Documentos</h2>
+    <ion-button v-if="!bare" size="small" fill="outline" @click="picker?.click()">Anexar arquivo</ion-button>
     <input
       ref="picker"
       class="fn-sr"
@@ -44,7 +44,7 @@ async function remove(id: string): Promise<void> {
       aria-label="Anexar arquivo"
       @change="onPick"
     />
-    <p v-if="files.length === 0" class="fn-muted">Nenhum arquivo nesta nota.</p>
+    <p v-if="files.length === 0 && !bare" class="fn-muted">Nenhum arquivo nesta nota.</p>
     <ul v-else class="fn-files">
       <li v-for="file in files" :key="file.id">
         <div class="fn-file-row">

@@ -1,6 +1,6 @@
 import type { SyncEntityName, SyncOperation } from '@/types/entities';
 import { keysToSnake, parseEntity, type ParsedEntity } from '@/sync/parsers';
-import { isRemoteConfigured } from '@/utils/env';
+import { getSupabase } from '@/services/supabaseClient';
 import { isRecord } from '@/utils/guards';
 import { parseJson } from '@/utils/json';
 
@@ -26,14 +26,8 @@ interface RemoteClient {
 let remoteClient: Promise<RemoteClient | null> | null = null;
 
 async function loadClient(): Promise<RemoteClient | null> {
-  if (!isRemoteConfigured()) return null;
-  const url = import.meta.env.VITE_SUPABASE_URL ?? '';
-  const key = import.meta.env.VITE_SUPABASE_ANON_KEY ?? '';
-  const { createClient } = await import('@supabase/supabase-js');
-  // Somente a anon key entra no cliente. A service role fica fora do app.
-  const supabase = createClient(url, key, {
-    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false },
-  });
+  const supabase = await getSupabase();
+  if (!supabase) return null;
   return {
     async upsert(table: string, row: RemoteRow): Promise<void> {
       const { error } = await supabase.from(table).upsert(row);
@@ -53,16 +47,25 @@ async function client(): Promise<RemoteClient | null> {
   return remoteClient;
 }
 
+async function upsertParsed(entity: SyncEntityName, record: ParsedEntity['record']): Promise<void> {
+  const remote = await client();
+  if (!remote) throw new Error('Supabase não configurado.');
+  const snake = keysToSnake({ ...record, syncStatus: 'synced' });
+  if (!isRecord(snake)) throw new Error('Payload local inválido.');
+  await remote.upsert(entity, snake);
+}
+
 export const supabaseGateway = {
   async push(op: SyncOperation): Promise<string> {
-    const remote = await client();
-    if (!remote) throw new Error('Supabase não configurado.');
     const parsed = parseEntity(op.entity, parseJson(op.payload));
     if (!parsed) throw new Error('Payload local inválido.');
-    const snake = keysToSnake({ ...parsed.record, syncStatus: 'synced' });
-    if (!isRecord(snake)) throw new Error('Payload local inválido.');
-    await remote.upsert(op.entity, snake);
+    await upsertParsed(op.entity, parsed.record);
     return parsed.record.updatedAt;
+  },
+
+  /** Grava a ficha direto, sem passar pela fila. O upload concluído usa isto. */
+  async upsertRecord(entity: SyncEntityName, record: ParsedEntity['record']): Promise<void> {
+    await upsertParsed(entity, record);
   },
 
   async pull(sinceIso: string): Promise<ParsedEntity[]> {

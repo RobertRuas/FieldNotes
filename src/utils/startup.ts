@@ -1,4 +1,5 @@
-import { NotificationService } from '@/services/NotificationService';
+import { resumeReminders } from '@/notifications/scheduler';
+import { SettingsService } from '@/services/SettingsService';
 import { prepareNativeShell } from '@/services/platform/nativeShell';
 import { SyncService } from '@/services/SyncService';
 import { pumpTransfers } from '@/sync/fileQueue';
@@ -30,6 +31,10 @@ export async function startup(): Promise<void> {
   await useSettingsStore().hydrate();
   await useAuthStore().hydrate();
   const userId = useAuthStore().userId;
+  if (userId && useAuthStore().signedIn) {
+    await SettingsService.bindUser(userId);
+    await useSettingsStore().hydrate();
+  }
   if (userId) await useDeviceStore().hydrate(userId);
   await Promise.all([
     useNotesStore().hydrate(),
@@ -40,8 +45,7 @@ export async function startup(): Promise<void> {
     useAudioStore().hydrate(),
   ]);
   SyncService.start();
-  NotificationService.preparePush();
   await prepareNativeShell(resolveDark(useSettingsStore().theme));
-  // A fila de arquivo não espera a rede. Sem upload real, continua aguardando.
+  void resumeReminders();
   void pumpTransfers();
 }

@@ -2,7 +2,7 @@
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { IonButton, IonContent, IonHeader, IonIcon, IonPage, IonToolbar } from '@ionic/vue';
-import { calendarOutline, listOutline } from 'ionicons/icons';
+import { addOutline, calendarOutline, listOutline } from 'ionicons/icons';
 import markUrl from '@/assets/mark.svg';
 import CalendarBoard from '@/components/CalendarBoard.vue';
 import EmptyState from '@/components/EmptyState.vue';
@@ -89,7 +89,7 @@ onMounted(() => {
 
 <template>
   <ion-page @ionViewDidEnter="measure">
-    <ion-header class="fn-header" translucent>
+    <ion-header class="fn-header">
       <ion-toolbar>
         <div class="fn-titlebar">
           <div class="fn-brand">
@@ -98,22 +98,21 @@ onMounted(() => {
           </div>
           <ion-button
             fill="clear"
+            class="fn-icon-btn"
             v-aria="{ label: viewLabel, pressed: notes.viewMode === 'list' }"
             @click="toggleView"
           >
             <ion-icon :icon="viewIcon" aria-hidden="true" />
           </ion-button>
-        </div>
-      </ion-toolbar>
-      <ion-toolbar>
-        <div class="fn-toolbar-stack">
-          <SyncStatus />
-          <ion-button expand="block" class="fn-new-note" @click="createNote">Nova nota</ion-button>
+          <button type="button" class="fn-plus" aria-label="Nova nota" @click="createNote">
+            <ion-icon :icon="addOutline" aria-hidden="true" />
+          </button>
         </div>
       </ion-toolbar>
     </ion-header>
     <ion-content ref="contentRef" class="fn-page" :scroll-events="true" fullscreen @ion-scroll="onScroll">
       <p v-if="sync.bootError" class="fn-boot" role="alert">{{ sync.bootError }}</p>
+      <SyncStatus />
       <template v-if="notes.viewMode === 'calendar'">
         <CalendarBoard :selected="notes.selectedDate" :today="today" :marked="marked" @select="selectDate" />
         <div :key="notes.selectedDate" class="fn-fade">
@@ -141,7 +140,7 @@ onMounted(() => {
         <EmptyState
           v-if="notes.listRows.length === 0"
           title="Nenhuma nota ainda"
-          body="Toque em Nova nota. Ela fica neste aparelho na hora."
+          <body="Toque em + para criar uma nota. Ela fica neste aparelho na hora."
         />
         <VirtualList v-else :rows="notes.listRows" :scroll-top="scrollTop" :viewport="viewport">
           <template #row="{ row }">

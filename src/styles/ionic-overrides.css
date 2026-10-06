@@ -1,17 +1,22 @@
 ion-app.fn-app {
-  background:
-    radial-gradient(1100px 460px at 0% -10%, color-mix(in srgb, var(--fn-mark) 18%, transparent), transparent 55%),
-    radial-gradient(860px 420px at 100% 0%, color-mix(in srgb, var(--fn-accent) 16%, transparent), transparent 50%),
-    var(--fn-bg);
+  background: var(--fn-bg);
+}
+
+ion-header.fn-header {
+  background: var(--fn-bg);
+  box-shadow: none;
 }
 
 ion-header.fn-header ion-toolbar {
-  --background: var(--fn-bar);
+  --background: var(--fn-bg);
   --border-width: 0 0 0.5px;
   --border-color: var(--fn-stroke);
   --min-height: 52px;
-  backdrop-filter: saturate(1.4) blur(var(--fn-blur));
-  -webkit-backdrop-filter: saturate(1.4) blur(var(--fn-blur));
+  --padding-start: max(20px, env(safe-area-inset-left));
+  --padding-end: max(20px, env(safe-area-inset-right));
+  --opacity: 1;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 ion-tab-bar.fn-tabs {
@@ -33,11 +38,11 @@ ion-tab-button ion-label {
 }
 
 ion-content.fn-page {
-  --background: transparent;
+  --background: var(--fn-bg);
   --padding-top: 8px;
   --padding-bottom: 20px;
-  --padding-start: max(16px, env(safe-area-inset-left));
-  --padding-end: max(16px, env(safe-area-inset-right));
+  --padding-start: max(20px, env(safe-area-inset-left));
+  --padding-end: max(20px, env(safe-area-inset-right));
 }
 
 ion-button.fn-new-note {
@@ -98,14 +103,20 @@ ion-input.fn-title-input {
   --placeholder-color: var(--fn-ink-soft);
   --placeholder-opacity: 0.7;
   min-height: 48px;
+  font-size: max(16px, calc(var(--fn-note-size) * 1.25));
 }
 
 ion-input.fn-title-input::part(native) {
   font-family: var(--fn-font-note);
-  font-size: var(--fn-text-xl);
+  font-size: max(16px, calc(var(--fn-note-size) * 1.25));
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.03em;
+}
+
+ion-input::part(native),
+ion-textarea::part(native) {
+  font-size: max(16px, 1em);
 }
 
 ion-textarea {

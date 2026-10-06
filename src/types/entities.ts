@@ -61,7 +61,7 @@ export interface Task extends EntityMeta {
   collectionId: string | null;
   title: string;
   detail: string;
-  /** `done` é a conclusão. O lembrete só fica gravado; nada é agendado no sistema. */
+  /** `done` é a conclusão. O lembrete também agenda o aviso neste aparelho. */
   done: boolean;
   date: string | null;
   time: string | null;
@@ -109,6 +109,7 @@ export interface Notification extends EntityMeta {
 }
 
 export interface AppSettings extends EntityMeta {
+  userId: string | null;
   theme: ThemeMode;
   contentTextSize: ContentTextSize;
 }

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content"
+      content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content"
     />
     <meta name="theme-color" content="#efece6" />
     <meta name="color-scheme" content="light dark" />
@@ -48,6 +48,31 @@
         } catch (error) {
           /* tema claro segue como padrão */
         }
+      })();
+    </script>
+    <script>
+      (function () {
+        var meta = document.querySelector('meta[name="viewport"]');
+        if (!meta) return;
+        var locked = meta.getAttribute('content');
+        document.addEventListener(
+          'focusin',
+          function (event) {
+            var target = event.target;
+            if (!target || !target.closest) return;
+            var field = target.closest('input, textarea, select, ion-input, ion-textarea, [contenteditable="true"]');
+            if (!field) return;
+            if (meta.getAttribute('content') !== locked) meta.setAttribute('content', locked);
+            var scale = window.visualViewport && window.visualViewport.scale;
+            if (scale && scale > 1) {
+              meta.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no');
+              requestAnimationFrame(function () {
+                meta.setAttribute('content', locked);
+              });
+            }
+          },
+          true,
+        );
       })();
     </script>
   </head>

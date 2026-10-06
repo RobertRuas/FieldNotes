@@ -8,7 +8,7 @@ import { useAttachmentsStore } from '@/stores/attachmentsStore';
 import type { Attachment } from '@/types/entities';
 import { visibleTransfer } from '@/sync/fileQueue';
 
-const props = defineProps<{ noteId: string }>();
+const props = defineProps<{ noteId: string; bare?: boolean }>();
 const emit = defineEmits<{ changed: [] }>();
 const attachments = useAttachmentsStore();
 const cameraInput = ref<HTMLInputElement | null>(null);
@@ -87,15 +87,15 @@ onBeforeUnmount(closePhoto);
 </script>
 
 <template>
-  <section class="fn-media" aria-label="Fotos">
-    <h2>Fotos</h2>
-    <div class="fn-media-actions">
+  <section v-if="!bare || photos.length > 0" class="fn-media" :class="{ 'is-bare': bare }" aria-label="Fotos">
+    <h2 v-if="!bare">Fotos</h2>
+    <div v-if="!bare" class="fn-media-actions">
       <ion-button size="small" @click="takePhoto">Tirar foto</ion-button>
       <ion-button size="small" fill="outline" @click="pickPhoto">Escolher foto</ion-button>
     </div>
     <input ref="cameraInput" class="fn-sr" type="file" accept="image/*" capture="environment" aria-label="Tirar foto" @change="addMany(filesOf($event))" />
     <input ref="libraryInput" class="fn-sr" type="file" accept="image/*" multiple aria-label="Escolher foto" @change="addMany(filesOf($event))" />
-    <p v-if="photos.length === 0" class="fn-muted">Nenhuma foto nesta nota.</p>
+    <p v-if="photos.length === 0 && !bare" class="fn-muted">Nenhuma foto nesta nota.</p>
     <div v-else class="fn-photos">
       <figure v-for="photo in photos" :key="photo.id" class="fn-photo-card">
         <button type="button" class="fn-photo-hit" :aria-label="`Abrir ${photo.name}`" @click="openPhoto(photo)">

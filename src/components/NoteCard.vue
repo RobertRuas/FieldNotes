@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { IonActionSheet, IonItem, IonItemOption, IonItemOptions, IonItemSliding } from '@ionic/vue';
+import { IonActionSheet, IonIcon, IonItem, IonItemOption, IonItemOptions, IonItemSliding } from '@ionic/vue';
+import { ellipsisHorizontal } from 'ionicons/icons';
 import { useNotesStore } from '@/stores/notesStore';
 import type { Note } from '@/types/entities';
 import { reminderLabel, timeLabel } from '@/utils/dates';
@@ -37,7 +38,9 @@ async function remove(): Promise<void> {
             <p v-if="notePreview(note)">{{ notePreview(note) }}</p>
             <small v-if="note.reminderAt">Lembrete {{ reminderLabel(note.reminderAt) }}</small>
           </button>
-          <button type="button" class="fn-text-btn" aria-label="Ações da nota" @click="sheet = true">Ações</button>
+          <button type="button" class="fn-more" aria-label="Ações da nota" @click="sheet = true">
+            <ion-icon :icon="ellipsisHorizontal" aria-hidden="true" />
+          </button>
         </article>
       </ion-item>
       <ion-item-options side="end">

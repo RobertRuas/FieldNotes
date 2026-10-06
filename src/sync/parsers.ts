@@ -259,8 +259,9 @@ export function parseEntity(entity: SyncEntityName, value: unknown): ParsedEntit
         'grande',
         'muito-grande',
       ]);
-      if (!theme || !contentTextSize) return null;
-      return { entity, record: { ...base, theme, contentTextSize } };
+      const userId = optionalText(camel, 'userId', null);
+      if (!theme || !contentTextSize || userId === undefined) return null;
+      return { entity, record: { ...base, userId, theme, contentTextSize } };
     }
     case 'devices': {
       const userId = text(camel, 'userId');

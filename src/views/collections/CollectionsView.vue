@@ -93,7 +93,7 @@ async function confirmRename(): Promise<void> {
 
 <template>
   <ion-page>
-    <ion-header class="fn-header" translucent>
+    <ion-header class="fn-header">
       <ion-toolbar>
         <div class="fn-titlebar">
           <h1>Coleções</h1>

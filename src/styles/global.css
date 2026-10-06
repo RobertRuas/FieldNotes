@@ -10,6 +10,12 @@ body,
   height: 100%;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  touch-action: manipulation;
+}
+
 body {
   margin: 0;
   font-family: var(--fn-font-ui);
@@ -22,6 +28,13 @@ button,
 input,
 textarea {
   font: inherit;
+}
+
+input,
+textarea,
+select,
+[contenteditable='true'] {
+  font-size: max(16px, 1em);
 }
 
 ::selection {
@@ -69,7 +82,7 @@ textarea {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding-inline: max(16px, env(safe-area-inset-left)) max(16px, env(safe-area-inset-right));
+  padding-inline: max(20px, env(safe-area-inset-left)) max(20px, env(safe-area-inset-right));
 }
 
 .fn-sync {
@@ -108,8 +121,8 @@ textarea {
 
 .fn-cal {
   display: grid;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 2px;
+  margin-bottom: 4px;
 }
 
 .fn-cal-head {
@@ -237,8 +250,10 @@ textarea {
   justify-content: center;
   gap: 8px;
   width: 100%;
+  min-height: 28px;
+  padding: 2px 0 0;
   color: var(--fn-ink-soft);
-  font-size: var(--fn-text-sm);
+  font-size: var(--fn-text-xs);
   touch-action: none;
 }
 
@@ -250,16 +265,16 @@ textarea {
 }
 
 .fn-month {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows var(--fn-motion) var(--fn-ease);
+  display: none;
 }
 
 .fn-month.open {
-  grid-template-rows: 1fr;
+  display: block;
+  margin-top: 4px;
 }
 
 .fn-month-inner {
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -288,7 +303,7 @@ textarea {
   align-items: baseline;
   justify-content: space-between;
   gap: 12px;
-  margin: 8px 0 12px;
+  margin: 2px 0 8px;
 }
 
 .fn-day-head h2 {
@@ -346,36 +361,57 @@ textarea {
 .fn-note-hit time,
 .fn-list-hit time {
   font-variant-numeric: tabular-nums;
-  color: var(--fn-accent);
-  font-size: var(--fn-text-sm);
-  font-weight: 650;
+  color: var(--fn-ink-soft);
+  font-size: 11px;
+  font-weight: 500;
 }
 
 .fn-note-hit strong,
 .fn-list-hit span,
 .fn-task-copy strong,
 .fn-collection-copy strong {
-  font-size: var(--fn-text-md);
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
 }
 
 .fn-note-hit p {
   grid-column: 2;
   margin: 0;
   color: var(--fn-ink-soft);
-  font-size: var(--fn-text-sm);
-  line-height: 1.4;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.35;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
+.fn-more {
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  min-height: 32px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--fn-ink-soft);
+  display: grid;
+  place-items: center;
+  align-self: center;
+}
+
+.fn-more ion-icon {
+  font-size: 18px;
+}
+
 .fn-note-hit small {
   grid-column: 2;
-  color: var(--fn-mark);
-  font-size: var(--fn-text-xs);
+  color: var(--fn-ink-soft);
+  font-size: 11px;
 }
 
 .fn-empty {
@@ -495,8 +531,15 @@ textarea {
   box-shadow: inset 0 0 0 3px var(--fn-bg);
 }
 
-.fn-editor-scroll {
-  --padding-top: 4px;
+ion-content.fn-editor-scroll {
+  --padding-top: 12px;
+  --padding-bottom: 20px;
+  --padding-start: max(20px, env(safe-area-inset-left));
+  --padding-end: max(20px, env(safe-area-inset-right));
+}
+
+html.fn-keyboard ion-content.fn-editor-scroll {
+  --padding-bottom: calc(var(--fn-keyboard-lift, 0px) + 24px);
 }
 
 .fn-meta {
@@ -518,16 +561,18 @@ textarea {
 
 .fn-note-content {
   font-family: var(--fn-font-note);
-  font-size: var(--fn-note-size);
+  font-size: max(16px, var(--fn-note-size));
   line-height: 1.55;
   color: var(--fn-ink);
 }
 
 .fn-editor {
-  min-height: 46vh;
+  min-height: 7.5rem;
   outline: none;
-  padding-bottom: 24px;
+  padding: 2px 2px 12px;
   overflow-wrap: anywhere;
+  scroll-margin-top: 12px;
+  scroll-margin-bottom: 72px;
 }
 
 .fn-editor.is-empty::before {
@@ -599,22 +644,180 @@ textarea {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-.fn-tools {
+html.fn-keyboard .fn-dock {
+  padding-bottom: 0;
+  transform: translateY(calc(-1 * var(--fn-keyboard-lift, 0px)));
+}
+
+.fn-dock-stack {
   display: flex;
+  flex-direction: column;
+}
+
+.fn-dock-extra,
+.fn-dock-main,
+.fn-tools,
+.fn-dock-actions {
+  display: flex;
+  align-items: center;
+}
+
+.fn-dock-extra,
+.fn-dock-main {
+  gap: 8px;
+  padding-inline: max(20px, env(safe-area-inset-left)) max(20px, env(safe-area-inset-right));
+}
+
+.fn-dock-extra {
   gap: 4px;
-  overflow-x: auto;
-  padding: 6px max(8px, env(safe-area-inset-right)) 6px max(8px, env(safe-area-inset-left));
+  padding-top: 6px;
+  padding-bottom: 2px;
+  border-bottom: 0.5px solid var(--fn-stroke);
+}
+
+.fn-dock-main {
+  justify-content: space-between;
+  min-height: 52px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.fn-tools,
+.fn-dock-actions {
+  gap: 2px;
+  min-width: 0;
+}
+
+.fn-dock .fn-tool {
+  width: 40px;
+  min-width: 40px;
+  height: 44px;
+  padding: 0;
+  flex: none;
 }
 
 .fn-tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 40px;
+  height: 44px;
   border-radius: 12px;
-  padding: 0 12px;
+  padding: 0 8px;
   font-weight: 700;
   color: var(--fn-ink);
 }
 
+.fn-dock .fn-tool-link,
+.fn-dock .fn-tool[data-live='true'] {
+  width: auto;
+  min-width: 44px;
+  padding-inline: 10px;
+}
+
+.fn-tool[aria-expanded='true'] {
+  background: color-mix(in srgb, var(--fn-accent) 14%, transparent);
+  color: var(--fn-accent);
+}
+
+.fn-rec-time {
+  font-size: 13px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.fn-tool ion-icon {
+  font-size: 22px;
+}
+
+.fn-tool[data-live='true'] {
+  color: var(--fn-danger);
+}
+
 .fn-tool[data-style='serif'] {
   font-family: var(--fn-font-note);
+  font-style: italic;
+}
+
+.fn-tool[data-style='underline'] {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.fn-plus {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--fn-accent);
+  color: var(--fn-accent-ink);
+  flex: none;
+}
+
+.fn-plus ion-icon {
+  font-size: 22px;
+}
+
+.fn-note-sheet {
+  background: var(--fn-bg-elevated);
+  border: 1px solid var(--fn-stroke);
+  border-radius: var(--fn-radius);
+  padding: 16px 16px 12px;
+}
+
+.fn-attachments {
+  display: grid;
+  gap: 10px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--fn-stroke);
+}
+
+.fn-media.is-bare {
+  margin-top: 0;
+  gap: 6px;
+}
+
+.fn-slider {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.fn-slider input {
+  width: 100%;
+  height: 32px;
+  accent-color: var(--fn-accent);
+  touch-action: none;
+}
+
+.fn-size-sample {
+  margin: 8px 0 0;
+  font-family: var(--fn-font-note);
+  font-size: var(--fn-note-size);
+  line-height: 1.45;
+  color: var(--fn-ink);
+}
+
+.fn-slider span {
+  min-width: 6.5rem;
+  text-align: right;
+  color: var(--fn-ink-soft);
+  font-size: var(--fn-text-sm);
+}
+
+.fn-account {
+  display: grid;
+  gap: 8px;
+}
+
+.fn-account-actions {
+  display: flex;
+  gap: 12px;
 }
 
 .fn-later {
@@ -749,6 +952,7 @@ textarea {
   background: var(--fn-bg);
   color: var(--fn-ink);
   padding: 0 12px;
+  font-size: max(16px, 1em);
 }
 
 .fn-boot {

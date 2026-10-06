@@ -16,7 +16,7 @@ import {
   IonToolbar,
 } from '@ionic/vue';
 import { ellipsisHorizontal } from 'ionicons/icons';
-import EditorToolbar from '@/components/EditorToolbar.vue';
+import EditorDock from '@/components/EditorDock.vue';
 import NoteAudio from '@/components/NoteAudio.vue';
 import NoteFiles from '@/components/NoteFiles.vue';
 import NotePhotos from '@/components/NotePhotos.vue';
@@ -103,8 +103,7 @@ const collectionLabel = computed(() => {
   return collections.items.find((item) => item.id === collectionId.value)?.name ?? 'Coleção';
 });
 const reminderText = computed(() => (reminderAt.value ? `Lembrete ${reminderLabel(reminderAt.value)}` : 'Lembrete'));
-const dockStyle = computed(() => (keyboard.value > 0 ? { transform: `translateY(-${keyboard.value}px)` } : undefined));
-const contentStyle = computed(() => ({ '--padding-bottom': `${keyboard.value + 16}px` }));
+const hasAttachments = computed(() => photos.value.length + documents.value.length + audio.value.length > 0);
 
 const deleteButtons: SheetButton[] = [
   { text: 'Excluir nota', role: 'destructive', handler: () => { void removeNote(); } },
@@ -384,8 +383,8 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <ion-page>
-    <ion-header class="fn-header" translucent>
+  <ion-page :class="{ 'is-typing': keyboard > 0 }">
+    <ion-header class="fn-header">
       <ion-toolbar>
         <ion-buttons slot="start">
           <ion-button fill="clear" @click="leave">Notas</ion-button>
@@ -398,7 +397,7 @@ onBeforeUnmount(() => {
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
-    <ion-content class="fn-page fn-editor-scroll" :fullscreen="true" :style="contentStyle">
+    <ion-content class="fn-page fn-editor-scroll" :fullscreen="false">
       <p v-if="missing" class="fn-boot" role="alert">Nota não encontrada.</p>
       <template v-else>
         <SyncStatus />
@@ -415,7 +414,14 @@ onBeforeUnmount(() => {
           <button type="button" class="fn-chip" @click="collectionOpen = true">{{ collectionLabel }}</button>
           <button type="button" class="fn-chip" @click="openReminder">{{ reminderText }}</button>
         </div>
-        <RichTextEditor :model-value="text" :revision="revision" @update:model-value="onText" />
+        <div class="fn-note-sheet">
+          <RichTextEditor :model-value="text" :revision="revision" @update:model-value="onText" />
+          <div v-if="noteIdRef && hasAttachments" class="fn-attachments">
+            <NotePhotos bare :note-id="noteIdRef" @changed="onMedia" />
+            <NoteFiles bare :note-id="noteIdRef" @changed="onMedia" />
+            <NoteAudio bare :note-id="noteIdRef" @changed="onMedia" />
+          </div>
+        </div>
         <NoteTaskList
           v-if="noteIdRef"
           ref="taskList"
@@ -424,15 +430,16 @@ onBeforeUnmount(() => {
           :date="dateKey"
           @changed="touch"
         />
-        <template v-if="noteIdRef">
-          <NotePhotos :note-id="noteIdRef" @changed="onMedia" />
-          <NoteFiles :note-id="noteIdRef" @changed="onMedia" />
-          <NoteAudio :note-id="noteIdRef" @changed="onMedia" />
-        </template>
       </template>
     </ion-content>
-    <ion-footer v-if="!missing" class="fn-dock" :style="dockStyle">
-      <EditorToolbar @command="onCommand" @link="openLink" />
+    <ion-footer v-if="!missing" class="fn-dock">
+      <EditorDock
+        v-if="noteIdRef"
+        :note-id="noteIdRef"
+        @command="onCommand"
+        @link="openLink"
+        @changed="onMedia"
+      />
     </ion-footer>
     <ion-modal :is-open="linkOpen" @didDismiss="linkOpen = false">
       <ion-header>
@@ -479,6 +486,7 @@ onBeforeUnmount(() => {
           />
           <ion-button expand="block" @click="confirmReminder">Guardar lembrete</ion-button>
           <ion-button expand="block" fill="clear" @click="clearReminder">Remover lembrete</ion-button>
+          <p class="fn-muted">Ao guardar, o aparelho pede permissão e agenda o aviso.</p>
         </div>
       </ion-content>
     </ion-modal>

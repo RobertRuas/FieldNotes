@@ -189,7 +189,7 @@ onBeforeUnmount(() => {
       <span>Lembrete</span>
       <input class="fn-native-time" type="datetime-local" :value="reminder" @change="onReminder" />
     </label>
-    <p class="fn-muted">O horário fica guardado nesta tarefa. O aviso do sistema ainda não é enviado.</p>
+    <p class="fn-muted">O horário fica nesta tarefa. Se você permitir, o aviso é agendado neste aparelho.</p>
     <button type="button" class="fn-chip" @click="collectionOpen = true">Coleção: {{ collectionLabel }}</button>
     <button type="button" class="fn-chip" @click="noteOpen = true">Nota: {{ noteLabel }}</button>
     <p v-if="priority" class="fn-sr">Prioridade {{ priorityLabel(priority) }}</p>

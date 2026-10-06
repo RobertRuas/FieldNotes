@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { IonActionSheet, IonItem, IonItemOption, IonItemOptions, IonItemSliding } from '@ionic/vue';
+import { IonActionSheet, IonIcon, IonItem, IonItemOption, IonItemOptions, IonItemSliding } from '@ionic/vue';
+import { ellipsisHorizontal } from 'ionicons/icons';
 import { useNotesStore } from '@/stores/notesStore';
 import type { NoteListRow } from '@/utils/noteList';
 import { timeLabel } from '@/utils/dates';
@@ -34,7 +35,9 @@ async function remove(): Promise<void> {
             <time :datetime="note.createdAt">{{ timeLabel(note.createdAt) }}</time>
             <span>{{ displayTitle(note) }}</span>
           </button>
-          <button type="button" class="fn-text-btn" aria-label="Ações da nota" @click="sheet = true">Ações</button>
+          <button type="button" class="fn-more" aria-label="Ações da nota" @click="sheet = true">
+            <ion-icon :icon="ellipsisHorizontal" aria-hidden="true" />
+          </button>
         </div>
       </ion-item>
       <ion-item-options side="end">

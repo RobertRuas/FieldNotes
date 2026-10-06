@@ -58,10 +58,10 @@
   --ion-placeholder-color: var(--fn-ink-soft);
 }
 
-:root[data-text-size='pequeno'] { --fn-note-size: 16px; }
+:root[data-text-size='pequeno'] { --fn-note-size: 15px; }
 :root[data-text-size='normal'] { --fn-note-size: 18px; }
-:root[data-text-size='grande'] { --fn-note-size: 21px; }
-:root[data-text-size='muito-grande'] { --fn-note-size: 25px; }
+:root[data-text-size='grande'] { --fn-note-size: 23px; }
+:root[data-text-size='muito-grande'] { --fn-note-size: 29px; }
 
 html.ion-palette-dark,
 :root[data-theme='dark'] {

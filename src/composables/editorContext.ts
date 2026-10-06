@@ -1,6 +1,6 @@
 import type { InjectionKey, Ref } from 'vue';
 
-export type EditorCommand = 'bold' | 'italic' | 'bullet' | 'ordered' | 'check';
+export type EditorCommand = 'bold' | 'italic' | 'underline' | 'bullet' | 'ordered' | 'check';
 
 export interface EditorApi {
   focus: () => void;

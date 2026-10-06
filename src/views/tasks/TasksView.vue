@@ -49,7 +49,7 @@ function openNote(id: string): void {
 
 <template>
   <ion-page>
-    <ion-header class="fn-header" translucent>
+    <ion-header class="fn-header">
       <ion-toolbar>
         <div class="fn-titlebar">
           <h1>Tarefas</h1>
@@ -72,7 +72,7 @@ function openNote(id: string): void {
       <EmptyState
         v-if="empty"
         title="Nenhuma tarefa ainda"
-        body="Uma tarefa fica neste aparelho na hora. O lembrete é só um horário guardado."
+        body="Uma tarefa fica neste aparelho na hora. O lembrete agenda um aviso quando você define o horário."
       />
       <template v-else>
         <section v-for="section in openSections" :key="section.id" class="fn-section">
