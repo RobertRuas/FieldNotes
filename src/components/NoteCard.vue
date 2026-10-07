@@ -16,7 +16,13 @@ const props = defineProps<{
   query?: string;
 }>();
 
-const emit = defineEmits<{ open: [id: string] }>();
+const emit = defineEmits<{
+  open: [id: string];
+  press: [event: PointerEvent];
+  move: [event: PointerEvent];
+  lift: [event: PointerEvent];
+  copy: [];
+}>();
 const notes = useNotesStore();
 const tasksStore = useTasksStore();
 const sheet = ref(false);
@@ -38,7 +44,19 @@ async function remove(): Promise<void> {
     <ion-item-sliding class="fn-slide">
       <ion-item lines="none" class="fn-slide-item">
         <article class="fn-note-card" :style="{ '--card-accent': accent ?? 'transparent' }">
-          <button type="button" class="fn-note-hit" @click="emit('open', note.id)">
+          <div
+            role="button"
+            tabindex="0"
+            class="fn-note-hit"
+            @click="emit('open', note.id)"
+            @keydown.enter.prevent="emit('open', note.id)"
+            @keydown.space.prevent="emit('open', note.id)"
+            @pointerdown="emit('press', $event)"
+            @pointermove="emit('move', $event)"
+            @pointerup="emit('lift', $event)"
+            @pointercancel="emit('lift', $event)"
+            @contextmenu.prevent="emit('copy')"
+          >
             <span class="fn-note-stamp">
               <strong v-if="query" v-html="titleHtml" />
               <strong v-else>{{ displayTitle(note) }}</strong>
@@ -57,7 +75,7 @@ async function remove(): Promise<void> {
             <p v-if="query && previewHtml" v-html="previewHtml" />
             <p v-else-if="previewText">{{ previewText }}</p>
             <small v-if="note.reminderAt">Lembrete {{ reminderLabel(note.reminderAt) }}</small>
-          </button>
+          </div>
           <button type="button" class="fn-more" aria-label="Ações da nota" @click="sheet = true">
             <ion-icon :icon="ellipsisHorizontal" aria-hidden="true" />
           </button>

@@ -14,6 +14,7 @@ const TABLES: readonly SyncEntityName[] = [
   'notifications',
   'settings',
   'devices',
+  'templates',
 ];
 
 type RemoteRow = Record<string, unknown>;

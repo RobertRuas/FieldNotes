@@ -31,6 +31,7 @@ TABLES = {
     "notifications",
     "settings",
     "devices",
+    "templates",
 }
 OWNED_BY_USER_ID = TABLES - {"users"}
 MAX_BODY = 14 * 1024 * 1024

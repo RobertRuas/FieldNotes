@@ -18,11 +18,13 @@ import NoteListRow from '@/components/NoteListRow.vue';
 import SyncStatus from '@/components/SyncStatus.vue';
 import VirtualList from '@/components/VirtualList.vue';
 import { primeKeyboard } from '@/composables/useKeyboardInset';
+import { pushToast } from '@/composables/useToast';
 import { useCollectionsStore } from '@/stores/collectionsStore';
 import { useNotesStore } from '@/stores/notesStore';
 import { useSyncStore } from '@/stores/syncStore';
 import type { Note } from '@/types/entities';
 import { groupLabel, todayKey } from '@/utils/dates';
+import { htmlToMultilinePlain } from '@/utils/html';
 import { ionElement, scrollIonToTop } from '@/utils/ionic';
 import { isRecord } from '@/utils/guards';
 import { matchNote, noteCountLabel } from '@/utils/text';
@@ -109,7 +111,140 @@ function createNote(): void {
   void router.push({ name: 'editor', params: { noteId: 'nova' }, query: { date } });
 }
 
+let copiedId = '';
+let pressTimer = 0;
+let pressNote: Note | null = null;
+let pressX = 0;
+let pressY = 0;
+let lastCopy = 0;
+let copyPending = false;
+
+function plainNote(note: Note): string {
+  const body = htmlToMultilinePlain(note.text).trim();
+  const title = note.title.trim();
+  if (title && body) return `${title}\n${body}`;
+  return body || title;
+}
+
+function writePlain(text: string): boolean {
+  const area = document.createElement('textarea');
+  area.value = text;
+  area.setAttribute('readonly', '');
+  area.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;pointer-events:none;';
+  document.body.appendChild(area);
+  area.focus({ preventScroll: true });
+  area.select();
+  area.setSelectionRange(0, area.value.length);
+  let copied = false;
+  try {
+    copied = document.execCommand('copy');
+  } finally {
+    area.remove();
+  }
+  return copied;
+}
+
+function holdCopy(note: Note): void {
+  copiedId = note.id;
+  window.setTimeout(() => {
+    if (copiedId === note.id) copiedId = '';
+  }, 900);
+}
+
+function markCopied(note: Note): void {
+  if (Date.now() - lastCopy < 700) return;
+  lastCopy = Date.now();
+  copyPending = false;
+  holdCopy(note);
+  pushToast('Texto copiado');
+}
+
+function copyNoteText(note: Note, trusted = true): void {
+  if (Date.now() - lastCopy < 700) return;
+  holdCopy(note);
+  const text = plainNote(note);
+  if (!text) {
+    lastCopy = Date.now();
+    pushToast('Nota sem texto');
+    return;
+  }
+  if (trusted && writePlain(text)) {
+    markCopied(note);
+    return;
+  }
+  const clip = navigator.clipboard;
+  if (!clip?.writeText) {
+    if (writePlain(text)) markCopied(note);
+    else if (trusted) pushToast('Não foi possível copiar');
+    else copyPending = true;
+    return;
+  }
+  void clip.writeText(text).then(
+    () => markCopied(note),
+    () => {
+      if (writePlain(text)) markCopied(note);
+      else if (trusted) pushToast('Não foi possível copiar');
+      else copyPending = true;
+    },
+  );
+}
+
+function clearPress(): void {
+  window.clearTimeout(pressTimer);
+  pressTimer = 0;
+  pressNote = null;
+}
+
+function beginPress(note: Note, event: PointerEvent): void {
+  if (event.pointerType === 'mouse' && event.button !== 0) return;
+  clearPress();
+  copyPending = false;
+  pressNote = note;
+  pressX = event.clientX;
+  pressY = event.clientY;
+  const target = event.currentTarget;
+  if (target instanceof Element) {
+    try {
+      target.setPointerCapture(event.pointerId);
+    } catch {
+      /* o alvo pode já ter soltado o ponteiro */
+    }
+  }
+  pressTimer = window.setTimeout(() => {
+    pressTimer = 0;
+    if (pressNote) copyNoteText(pressNote, false);
+  }, 450);
+}
+
+function movePress(event: PointerEvent): void {
+  if (!pressTimer) return;
+  if (Math.hypot(event.clientX - pressX, event.clientY - pressY) > 28) clearPress();
+}
+
+function endPress(event: PointerEvent): void {
+  const note = pressNote;
+  const pending = copyPending;
+  const waiting = pressTimer !== 0;
+  const armed = note !== null && !waiting && copiedId === note.id && Date.now() - lastCopy >= 700;
+  if (event.type === 'pointercancel' || waiting) {
+    clearPress();
+    copyPending = false;
+    return;
+  }
+  clearPress();
+  if (note && (pending || armed)) copyNoteText(note, true);
+}
+
+function beginRow(row: { kind: string; note?: Note }, event: PointerEvent): void {
+  if (row.kind !== 'note' || !row.note) return;
+  beginPress(row.note, event);
+}
+
 function openNote(id: string): void {
+  if (copiedId === id) {
+    copiedId = '';
+    return;
+  }
   void router.push({ name: 'editor', params: { noteId: id } });
 }
 
@@ -216,6 +351,10 @@ onMounted(() => {
               :accent="accentFor(note)"
               :query="searchQuery"
               @open="openNote"
+              @press="beginPress(note, $event)"
+              @move="movePress"
+              @lift="endPress"
+              @copy="copyNoteText(note)"
             />
           </div>
         </div>
@@ -233,6 +372,10 @@ onMounted(() => {
               :note="note"
               :accent="accentFor(note)"
               @open="openNote"
+              @press="beginPress(note, $event)"
+              @move="movePress"
+              @lift="endPress"
+              @copy="copyNoteText(note)"
             />
           </div>
         </section>
@@ -253,6 +396,10 @@ onMounted(() => {
               :note="note"
               :accent="accentFor(note)"
               @open="openNote"
+              @press="beginPress(note, $event)"
+              @move="movePress"
+              @lift="endPress"
+              @copy="copyNoteText(note)"
             />
           </div>
         </div>
@@ -265,7 +412,14 @@ onMounted(() => {
         />
         <VirtualList v-else :rows="notes.listRows" :scroll-top="scrollTop" :viewport="viewport">
           <template #row="{ row }">
-            <NoteListRow :row="row" @open="openNote" />
+            <NoteListRow
+              :row="row"
+              @open="openNote"
+              @press="beginRow(row, $event)"
+              @move="movePress"
+              @lift="endPress"
+              @copy="row.kind === 'note' && row.note ? copyNoteText(row.note) : undefined"
+            />
           </template>
         </VirtualList>
       </template>

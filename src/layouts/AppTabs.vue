@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { IonIcon, IonLabel, IonPage, IonRouterOutlet, IonTabBar, IonTabButton, IonTabs } from '@ionic/vue';
-import { albumsOutline, documentTextOutline, settingsOutline } from 'ionicons/icons';
+import { albumsOutline, documentTextOutline, flashOutline, settingsOutline } from 'ionicons/icons';
 </script>
 
 <template>
@@ -15,6 +15,10 @@ import { albumsOutline, documentTextOutline, settingsOutline } from 'ionicons/ic
         <ion-tab-button tab="colecoes" href="/colecoes">
           <ion-icon :icon="albumsOutline" aria-hidden="true" />
           <ion-label>Coleções</ion-label>
+        </ion-tab-button>
+        <ion-tab-button tab="modelos" href="/modelos">
+          <ion-icon :icon="flashOutline" aria-hidden="true" />
+          <ion-label>Modelos</ion-label>
         </ion-tab-button>
         <ion-tab-button tab="configuracoes" href="/configuracoes">
           <ion-icon :icon="settingsOutline" aria-hidden="true" />

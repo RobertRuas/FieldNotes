@@ -13,6 +13,7 @@ import type {
   Task,
   User,
 } from '@/types/entities';
+import type { NoteTemplate } from '@/templates/types';
 
 export const db = new Dexie('fieldnotes') as Dexie & {
   users: EntityTable<User, 'id'>;
@@ -27,6 +28,7 @@ export const db = new Dexie('fieldnotes') as Dexie & {
   devices: EntityTable<Device, 'id'>;
   local_files: EntityTable<LocalFile, 'id'>;
   file_queue: EntityTable<FileTransfer, 'id'>;
+  templates: EntityTable<NoteTemplate, 'id'>;
 };
 
 db.version(1).stores({
@@ -51,6 +53,10 @@ db.version(2).stores({
 db.version(3).stores({
   local_files: 'id',
   file_queue: 'id, targetId, status, updatedAt',
+});
+
+db.version(4).stores({
+  templates: 'id, userId, name, updatedAt, deletedAt, syncStatus',
 });
 
 export async function openDatabase(): Promise<void> {

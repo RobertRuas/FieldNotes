@@ -11,6 +11,12 @@ const routes: RouteRecordRaw[] = [
       { path: 'notas', name: 'notas', component: () => import('@/views/notes/NotesHome.vue') },
       { path: 'tarefas', redirect: '/notas' },
       { path: 'colecoes', name: 'colecoes', component: () => import('@/views/collections/CollectionsView.vue') },
+      { path: 'modelos', name: 'modelos', component: () => import('@/templates/views/TemplatesHome.vue') },
+      {
+        path: 'modelos/:templateId/executar',
+        name: 'modelo-executar',
+        component: () => import('@/templates/views/TemplateWizard.vue'),
+      },
       { path: 'colecoes/:collectionId', name: 'colecao', component: () => import('@/views/collections/CollectionDetail.vue') },
       { path: 'configuracoes', name: 'configuracoes', component: () => import('@/views/settings/SettingsView.vue') },
     ],
@@ -24,6 +30,11 @@ const routes: RouteRecordRaw[] = [
     path: '/nota/:noteId',
     name: 'editor',
     component: () => import('@/views/notes/NoteEditor.vue'),
+  },
+  {
+    path: '/modelos/:templateId',
+    name: 'modelo',
+    component: () => import('@/templates/views/TemplateEditor.vue'),
   },
   { path: '/:pathMatch(.*)*', redirect: '/notas' },
 ];

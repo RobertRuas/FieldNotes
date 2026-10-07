@@ -10,7 +10,13 @@ import type { NoteListRow } from '@/utils/noteList';
 import { displayTitle, notePreview } from '@/utils/text';
 
 const props = defineProps<{ row: NoteListRow }>();
-const emit = defineEmits<{ open: [id: string] }>();
+const emit = defineEmits<{
+  open: [id: string];
+  press: [event: PointerEvent];
+  move: [event: PointerEvent];
+  lift: [event: PointerEvent];
+  copy: [];
+}>();
 const notes = useNotesStore();
 const tasksStore = useTasksStore();
 const sheet = ref(false);
@@ -32,7 +38,19 @@ async function remove(): Promise<void> {
     <ion-item-sliding class="fn-slide">
       <ion-item lines="none" class="fn-slide-item">
         <div class="fn-list-row">
-          <button type="button" class="fn-list-hit" @click="emit('open', note.id)">
+          <div
+            role="button"
+            tabindex="0"
+            class="fn-list-hit"
+            @click="emit('open', note.id)"
+            @keydown.enter.prevent="emit('open', note.id)"
+            @keydown.space.prevent="emit('open', note.id)"
+            @pointerdown="emit('press', $event)"
+            @pointermove="emit('move', $event)"
+            @pointerup="emit('lift', $event)"
+            @pointercancel="emit('lift', $event)"
+            @contextmenu.prevent="emit('copy')"
+          >
             <span class="fn-note-stamp">
               <strong>{{ displayTitle(note) }}</strong>
               <SyncMark :status="note.syncStatus" />
@@ -48,7 +66,7 @@ async function remove(): Promise<void> {
               </span>
             </span>
             <small v-if="notePreview(note)">{{ notePreview(note) }}</small>
-          </button>
+          </div>
           <button type="button" class="fn-more" aria-label="Ações da nota" @click="sheet = true">
             <ion-icon :icon="ellipsisHorizontal" aria-hidden="true" />
           </button>

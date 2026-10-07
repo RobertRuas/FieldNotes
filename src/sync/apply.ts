@@ -23,6 +23,8 @@ async function readLocal(entity: SyncEntityName, id: string): Promise<EntityMeta
       return db.settings.get(id);
     case 'devices':
       return db.devices.get(id);
+    case 'templates':
+      return db.templates.get(id);
     default: {
       const neverEntity: never = entity;
       return neverEntity;
@@ -60,6 +62,8 @@ async function markTable(entity: SyncEntityName, id: string, updatedAt: string):
       return touchSynced(await db.settings.get(id), updatedAt, (next) => db.settings.put(next));
     case 'devices':
       return touchSynced(await db.devices.get(id), updatedAt, (next) => db.devices.put(next));
+    case 'templates':
+      return touchSynced(await db.templates.get(id), updatedAt, (next) => db.templates.put(next));
     default: {
       const neverEntity: never = entity;
       return neverEntity;
@@ -117,6 +121,9 @@ export async function applyRemoteRecord(parsed: ParsedEntity): Promise<'applied'
       break;
     case 'devices':
       await db.devices.put({ ...parsed.record, syncStatus: 'synced' });
+      break;
+    case 'templates':
+      await db.templates.put({ ...parsed.record, syncStatus: 'synced' });
       break;
     default: {
       const neverParsed: never = parsed;

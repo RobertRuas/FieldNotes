@@ -19,7 +19,8 @@ export type SyncEntityName =
   | 'audio_recordings'
   | 'notifications'
   | 'settings'
-  | 'devices';
+  | 'devices'
+  | 'templates';
 
 export type SyncOperationKind = 'upsert' | 'delete';
 

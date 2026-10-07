@@ -17,6 +17,8 @@ import type {
   ThemeMode,
   User,
 } from '@/types/entities';
+import type { NoteTemplate } from '@/templates/types';
+import { templateFromRow } from '@/templates/utils/record';
 import { isDateKey, isTimeKey } from '@/utils/dates';
 import { isRecord } from '@/utils/guards';
 import { isPriority, normalizeTask } from '@/utils/tasks';
@@ -30,7 +32,8 @@ export type ParsedEntity =
   | { entity: 'audio_recordings'; record: AudioRecording }
   | { entity: 'notifications'; record: Notification }
   | { entity: 'settings'; record: AppSettings }
-  | { entity: 'devices'; record: Device };
+  | { entity: 'devices'; record: Device }
+  | { entity: 'templates'; record: NoteTemplate };
 
 const STATUSES: readonly SyncStatus[] = ['pending', 'synced', 'error', 'conflict'];
 
@@ -273,6 +276,11 @@ export function parseEntity(entity: SyncEntityName, value: unknown): ParsedEntit
       const pushToken = optionalText(camel, 'pushToken', null);
       if (!userId || name === null || !platform || pushToken === undefined) return null;
       return { entity, record: { ...base, userId, name, platform, pushToken } };
+    }
+    case 'templates': {
+      const record = templateFromRow(base, camel);
+      if (!record) return null;
+      return { entity, record };
     }
     default: {
       const neverEntity: never = entity;

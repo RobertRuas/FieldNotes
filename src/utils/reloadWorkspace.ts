@@ -9,6 +9,7 @@ import { useNotesStore } from '@/stores/notesStore';
 import { useNotificationStore } from '@/stores/notificationStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useTasksStore } from '@/stores/tasksStore';
+import { useTemplatesStore } from '@/stores/templatesStore';
 
 export async function reloadWorkspace(): Promise<void> {
   const auth = useAuthStore();
@@ -25,6 +26,7 @@ export async function reloadWorkspace(): Promise<void> {
     useNotificationStore().hydrate(),
     useAttachmentsStore().hydrate(),
     useAudioStore().hydrate(),
+    useTemplatesStore().hydrate(),
   ]);
   await resumeReminders();
 }

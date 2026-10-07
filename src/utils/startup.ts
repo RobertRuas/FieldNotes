@@ -13,6 +13,7 @@ import { useNotificationStore } from '@/stores/notificationStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useSyncStore } from '@/stores/syncStore';
 import { useTasksStore } from '@/stores/tasksStore';
+import { useTemplatesStore } from '@/stores/templatesStore';
 import { openDatabase } from '@/database/db';
 import { resolveDark } from '@/utils/theme';
 
@@ -30,6 +31,7 @@ export async function startup(): Promise<void> {
     void useSettingsStore().hydrate();
     void useAttachmentsStore().hydrate();
     void useAudioStore().hydrate();
+    void useTemplatesStore().hydrate();
   });
   await useSettingsStore().hydrate();
   await useAuthStore().hydrate();
@@ -46,6 +48,7 @@ export async function startup(): Promise<void> {
     useNotificationStore().hydrate(),
     useAttachmentsStore().hydrate(),
     useAudioStore().hydrate(),
+    useTemplatesStore().hydrate(),
   ]);
   SyncService.start();
   await prepareNativeShell(resolveDark(useSettingsStore().theme));
