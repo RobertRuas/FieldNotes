@@ -84,7 +84,7 @@ onBeforeUnmount(closePhoto);
     <div v-if="!bare" class="fn-media-actions">
       <ion-button size="small" fill="outline" @click="pickPhoto">Adicionar fotografia</ion-button>
     </div>
-    <input ref="libraryInput" class="fn-sr" type="file" accept="image/*" multiple aria-label="Adicionar fotografia" @change="addMany(filesOf($event))" />
+    <input ref="libraryInput" class="fn-file-input" type="file" accept="image/*" multiple aria-label="Adicionar fotografia" @change="addMany(filesOf($event))" />
     <p v-if="photos.length === 0 && !bare" class="fn-muted">Nenhuma foto nesta nota.</p>
     <p v-if="photos.length > 0" class="fn-attach-cat">Fotos</p>
     <ul v-if="photos.length > 0" class="fn-attach-list">

@@ -44,6 +44,17 @@ select,
   background: color-mix(in srgb, var(--fn-accent) 28%, transparent);
 }
 
+.fn-file-input {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  border: 0;
+  padding: 0;
+}
+
 .fn-sr {
   position: absolute;
   width: 1px;

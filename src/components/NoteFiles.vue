@@ -43,7 +43,7 @@ async function remove(id: string): Promise<void> {
     <ion-button v-if="!bare" size="small" fill="outline" @click="picker?.click()">Anexar arquivo</ion-button>
     <input
       ref="picker"
-      class="fn-sr"
+      class="fn-file-input"
       type="file"
       multiple
       aria-label="Anexar arquivo"

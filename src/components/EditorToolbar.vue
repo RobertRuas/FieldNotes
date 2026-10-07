@@ -30,6 +30,8 @@ const extra: { command: EditorCommand; label: string; text: string }[] = [
 ];
 
 function hold(event: MouseEvent): void {
+  const target = event.target;
+  if (target instanceof Element && target.closest('[data-picker]')) return;
   event.preventDefault();
 }
 </script>

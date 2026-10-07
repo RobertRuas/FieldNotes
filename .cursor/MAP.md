@@ -20,7 +20,7 @@ A regra lê só **Onde ir** e para em `## Rotas`. Uma linha, um arquivo na colun
 | Criar nota, autosave, sair, apagar | `src/views/notes/NoteEditor.vue` | `src/composables/useAutosave.ts` ou `src/utils/editorBackup.ts` só se o save falhar | RichTextEditor, store |
 | Foco e teclado ao criar nota (`/nota/nova`) | `src/views/notes/NoteEditor.vue` (`isEditing`, `focusComposer`) | `src/components/RichTextEditor.vue` método `focus`; `primeKeyboard` em `src/composables/useKeyboardInset.ts` se o teclado não abrir no toque do `+` | store, CalendarBoard |
 | Negrito, lista, link, colar | `src/components/RichTextEditor.vue` | `src/composables/editorContext.ts` se o comando não chegar; `src/utils/html.ts` se o HTML sujar | EditorToolbar, NoteEditor |
-| Barra do editor (foto, áudio, tarefa, formato) | `src/components/EditorDock.vue` | `src/components/EditorToolbar.vue` só para o botão de formato | NoteEditor |
+| Barra do editor (foto, áudio, tarefa, formato) | `src/components/EditorDock.vue` | `src/components/EditorToolbar.vue` só para o botão de formato. Foto e arquivo usam `data-picker` para o `mousedown` não cancelar o seletor | NoteEditor |
 | Menu da nota (fixar, favorito, coleção, apagar) | `src/components/NoteMenu.vue` | — | NoteEditor |
 | Definir lembrete da nota | `src/views/notes/NoteEditor.vue` (`reminderOpen`) | CSS `.fn-remind-sheet`, `.fn-remind-when` | NoteMenu, scheduler |
 | Fotos | `src/components/NotePhotos.vue` | `src/services/platform/camera.ts` só se a captura falhar | attachmentsStore |

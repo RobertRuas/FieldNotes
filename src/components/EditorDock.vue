@@ -147,14 +147,14 @@ onBeforeUnmount(() => finish(false));
         <ion-icon :icon="micOutline" aria-hidden="true" />
         <span v-if="recording" class="fn-rec-time">{{ clockLabel(elapsed) }}</span>
       </button>
-      <button type="button" class="fn-tool" aria-label="Adicionar fotografia" @mousedown="holdFocus" @click="pickPhoto">
+      <button type="button" class="fn-tool" data-picker aria-label="Adicionar fotografia" @click="pickPhoto">
         <ion-icon :icon="imageOutline" aria-hidden="true" />
       </button>
-      <button type="button" class="fn-tool" aria-label="Anexar arquivo" @mousedown="holdFocus" @click="fileInput?.click()">
+      <button type="button" class="fn-tool" data-picker aria-label="Anexar arquivo" @click="fileInput?.click()">
         <ion-icon :icon="attachOutline" aria-hidden="true" />
       </button>
     </EditorToolbar>
-    <input ref="libraryInput" class="fn-sr" type="file" accept="image/*" multiple aria-label="Adicionar fotografia" @change="addPhotos(filesOf($event))" />
-    <input ref="fileInput" class="fn-sr" type="file" multiple aria-label="Anexar arquivo" @change="pickFiles" />
+    <input ref="libraryInput" class="fn-file-input" type="file" accept="image/*" multiple aria-label="Adicionar fotografia" @change="addPhotos(filesOf($event))" />
+    <input ref="fileInput" class="fn-file-input" type="file" multiple aria-label="Anexar arquivo" @change="pickFiles" />
   </div>
 </template>
