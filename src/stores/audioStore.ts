@@ -8,6 +8,7 @@ import { db } from '@/database/db';
 import { dropTransfer, enqueueTransfer, onTransfersChanged, retryTransfer } from '@/sync/fileQueue';
 import type { AudioRecording, FileTransfer } from '@/types/entities';
 import { nowIso } from '@/utils/dates';
+import { fileTooLarge } from '@/utils/files';
 import { createId } from '@/utils/id';
 
 export const useAudioStore = defineStore('audioStore', () => {
@@ -47,6 +48,10 @@ export const useAudioStore = defineStore('audioStore', () => {
   async function addClip(noteId: string, blob: Blob, durationMs: number, mimeType: string): Promise<AudioRecording | null> {
     const userId = useAuthStore().userId;
     if (!userId || !noteId || blob.size === 0) return null;
+    if (fileTooLarge(blob.size)) {
+      pushToast('Arquivo grande demais para este aparelho.');
+      return null;
+    }
     const id = createId();
     const now = nowIso();
     let localUri: string;

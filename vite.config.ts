@@ -1,11 +1,22 @@
 import { fileURLToPath, URL } from 'node:url';
 import vue from '@vitejs/plugin-vue';
 import { VitePWA } from 'vite-plugin-pwa';
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 
 const iconSizes = [72, 96, 128, 144, 152, 180, 192, 384, 512] as const;
 
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '');
+  const remote = env.VITE_SUPABASE_URL?.trim();
+  const proxy = remote
+    ? {
+        '/auth': { target: remote, changeOrigin: true },
+        '/rest': { target: remote, changeOrigin: true },
+        '/storage': { target: remote, changeOrigin: true },
+      }
+    : undefined;
+
+  return {
   plugins: [
     vue(),
     VitePWA({
@@ -67,6 +78,12 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  server: {
+    // No telemóvel a página está noutro endereço. O pedido de login segue por aqui
+    // e o Vite encaminha para o servidor, senão o Safari recusa a resposta.
+    host: true,
+    proxy,
+  },
   build: {
     target: 'es2022',
     sourcemap: false,
@@ -81,4 +98,5 @@ export default defineConfig({
       },
     },
   },
+  };
 });

@@ -8,7 +8,8 @@ export function phaseFor(input: {
 }): SyncPhase {
   if (!input.online) return 'offline';
   if (input.syncing) return 'syncing';
-  if (input.remoteConfigured && input.pending > 0) return 'saved-local';
+  // Sem nuvem, ou com alterações ainda na fila, nada foi confirmado no servidor.
+  if (!input.remoteConfigured || input.pending > 0) return 'saved-local';
   return 'synced';
 }
 

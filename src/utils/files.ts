@@ -1,4 +1,4 @@
-const MAX_BYTES = 30 * 1024 * 1024;
+const MAX_BYTES = 12 * 1024 * 1024;
 
 export function fileTooLarge(size: number): boolean {
   return size > MAX_BYTES;

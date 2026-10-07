@@ -52,6 +52,16 @@ export function addDays(key: string, days: number): string {
   return toDateKey(date);
 }
 
+export function addMonths(key: string, months: number): string {
+  const date = parseDateKey(key);
+  const targetDay = date.getDate();
+  date.setDate(1);
+  date.setMonth(date.getMonth() + months);
+  const daysInTargetMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+  date.setDate(Math.min(targetDay, daysInTargetMonth));
+  return toDateKey(date);
+}
+
 export function startOfWeek(key: string): string {
   const date = parseDateKey(key);
   const weekday = date.getDay();
@@ -106,6 +116,18 @@ export function groupLabel(key: string, today: string): string {
   if (key === addDays(today, -1)) return 'Ontem';
   if (key === addDays(today, 1)) return 'Amanhã';
   return longDateLabel(key);
+}
+
+export function noteStamp(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return '';
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const day = pad(date.getDate());
+  const month = pad(date.getMonth() + 1);
+  const year = String(date.getFullYear()).slice(-2);
+  const hour = pad(date.getHours());
+  const minute = pad(date.getMinutes());
+  return `${day}-${month}-${year} ${hour}:${minute}`;
 }
 
 export function timeLabel(iso: string): string {

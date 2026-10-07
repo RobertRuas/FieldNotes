@@ -48,7 +48,9 @@ create table if not exists public.notes (
   photos jsonb not null default '[]'::jsonb,
   documents jsonb not null default '[]'::jsonb,
   audio jsonb not null default '[]'::jsonb,
-  tasks jsonb not null default '[]'::jsonb
+  tasks jsonb not null default '[]'::jsonb,
+  pinned boolean not null default false,
+  favorite boolean not null default false
 );
 
 create table if not exists public.collections (
@@ -140,7 +142,7 @@ create table if not exists public.settings (
   theme text not null,
   content_text_size text not null,
   constraint settings_theme_check check (theme in ('light', 'dark', 'auto')),
-  constraint settings_size_check check (content_text_size in ('pequeno', 'normal', 'grande', 'muito-grande'))
+  constraint settings_size_check check (content_text_size in ('minimo', 'pequeno', 'normal', 'grande', 'muito-grande'))
 );
 
 create table if not exists public.devices (

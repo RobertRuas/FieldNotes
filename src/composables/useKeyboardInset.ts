@@ -1,5 +1,30 @@
 import { onBeforeUnmount, onMounted, ref, type Ref } from 'vue';
 
+let keyboardHold: HTMLInputElement | null = null;
+let keyboardHoldTimer = 0;
+
+export function primeKeyboard(): void {
+  releaseKeyboard();
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.autocomplete = 'off';
+  input.enterKeyHint = 'done';
+  input.setAttribute('aria-hidden', 'true');
+  input.tabIndex = -1;
+  input.style.cssText =
+    'position:fixed;left:0;bottom:0;width:1px;height:1px;opacity:0;border:0;padding:0;font-size:16px;';
+  document.body.appendChild(input);
+  input.focus();
+  keyboardHold = input;
+  keyboardHoldTimer = window.setTimeout(releaseKeyboard, 2000);
+}
+
+export function releaseKeyboard(): void {
+  window.clearTimeout(keyboardHoldTimer);
+  keyboardHold?.remove();
+  keyboardHold = null;
+}
+
 function editing(): boolean {
   const el = document.activeElement;
   if (!(el instanceof HTMLElement)) return false;

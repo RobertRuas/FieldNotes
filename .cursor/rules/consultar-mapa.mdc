@@ -1,0 +1,22 @@
+---
+description: Abrir só o arquivo da coluna Editar em Onde ir; não explorar o repositório
+alwaysApply: true
+---
+
+# Um arquivo por pedido
+
+Não explore o repositório. Não leia `.cursor/MAP.md` inteiro.
+
+1. Leia só a tabela **Onde ir**, até a seção `## Rotas`. Pare aí.
+2. Uma linha. Abra só a coluna **Editar**. A coluna **Extra** só se esse arquivo não contiver a mudança.
+3. CSS: não leia `global.css`. Busque a classe da linha e leia só o bloco.
+4. Com a linha achada, é proibido: varrer `src/`, `grep` no repo, abrir `node_modules`, `package.json`, stores, services, views, tipos ou sync que a linha não citou.
+5. Sem linha: busque um símbolo, edite, e no mesmo change acrescente uma linha com um único arquivo em **Editar**.
+
+UI não abre store nem service. Dados não abrem a view.
+
+```text
+Pedido: "destaca o texto achado na busca"
+Onde ir: Destaque da busca → Editar src/utils/text.ts
+Ação: abrir text.ts. Não abrir NotesHome, AppHeader, store, ionicons.
+```

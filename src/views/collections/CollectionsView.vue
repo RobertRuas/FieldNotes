@@ -17,6 +17,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/vue';
+import AppHeader from '@/components/AppHeader.vue';
 import EmptyState from '@/components/EmptyState.vue';
 import SyncStatus from '@/components/SyncStatus.vue';
 import { useCollectionsStore } from '@/stores/collectionsStore';
@@ -93,14 +94,8 @@ async function confirmRename(): Promise<void> {
 
 <template>
   <ion-page>
-    <ion-header class="fn-header">
-      <ion-toolbar>
-        <div class="fn-titlebar">
-          <h1>Coleções</h1>
-        </div>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content class="fn-page" fullscreen>
+    <AppHeader title="Coleções" />
+    <ion-content class="fn-page">
       <SyncStatus />
       <form class="fn-form" @submit.prevent="add">
         <ion-input

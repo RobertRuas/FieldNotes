@@ -2,7 +2,7 @@
 import { onBeforeUnmount, ref } from 'vue';
 import { Capacitor } from '@capacitor/core';
 import { IonIcon } from '@ionic/vue';
-import { attachOutline, cameraOutline, imageOutline, micOutline } from 'ionicons/icons';
+import { attachOutline, imageOutline, micOutline } from 'ionicons/icons';
 import EditorToolbar from '@/components/EditorToolbar.vue';
 import type { EditorCommand } from '@/composables/editorContext';
 import { pushToast } from '@/composables/useToast';
@@ -16,7 +16,6 @@ const emit = defineEmits<{ command: [command: EditorCommand]; link: []; changed:
 
 const attachments = useAttachmentsStore();
 const audioStore = useAudioStore();
-const cameraInput = ref<HTMLInputElement | null>(null);
 const libraryInput = ref<HTMLInputElement | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 const recording = ref(false);
@@ -108,19 +107,6 @@ async function addPhotos(files: File[]): Promise<void> {
   if (added) emit('changed');
 }
 
-async function takePhoto(): Promise<void> {
-  if (Capacitor.isNativePlatform()) {
-    try {
-      const created = await attachments.addFromNative(props.noteId, 'camera');
-      if (created) emit('changed');
-    } catch {
-      pushToast('Não foi possível abrir a câmera.');
-    }
-    return;
-  }
-  cameraInput.value?.click();
-}
-
 async function pickPhoto(): Promise<void> {
   if (Capacitor.isNativePlatform()) {
     try {
@@ -161,18 +147,14 @@ onBeforeUnmount(() => finish(false));
         <ion-icon :icon="micOutline" aria-hidden="true" />
         <span v-if="recording" class="fn-rec-time">{{ clockLabel(elapsed) }}</span>
       </button>
-      <button type="button" class="fn-tool" aria-label="Tirar foto" @mousedown="holdFocus" @click="takePhoto">
-        <ion-icon :icon="cameraOutline" aria-hidden="true" />
-      </button>
-      <button type="button" class="fn-tool" aria-label="Escolher foto" @mousedown="holdFocus" @click="pickPhoto">
+      <button type="button" class="fn-tool" aria-label="Adicionar fotografia" @mousedown="holdFocus" @click="pickPhoto">
         <ion-icon :icon="imageOutline" aria-hidden="true" />
       </button>
       <button type="button" class="fn-tool" aria-label="Anexar arquivo" @mousedown="holdFocus" @click="fileInput?.click()">
         <ion-icon :icon="attachOutline" aria-hidden="true" />
       </button>
     </EditorToolbar>
-    <input ref="cameraInput" class="fn-sr" type="file" accept="image/*" capture="environment" aria-label="Tirar foto" @change="addPhotos(filesOf($event))" />
-    <input ref="libraryInput" class="fn-sr" type="file" accept="image/*" multiple aria-label="Escolher foto" @change="addPhotos(filesOf($event))" />
+    <input ref="libraryInput" class="fn-sr" type="file" accept="image/*" multiple aria-label="Adicionar fotografia" @change="addPhotos(filesOf($event))" />
     <input ref="fileInput" class="fn-sr" type="file" multiple aria-label="Anexar arquivo" @change="pickFiles" />
   </div>
 </template>

@@ -4,6 +4,8 @@ export type EditorCommand = 'bold' | 'italic' | 'underline' | 'bullet' | 'ordere
 
 export interface EditorApi {
   focus: () => void;
+  selectAll: () => void;
+  clearSelection: () => void;
   rememberRange: () => void;
   run: (command: EditorCommand) => void;
   insertLink: (url: string) => void;

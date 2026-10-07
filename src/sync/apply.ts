@@ -34,12 +34,13 @@ async function touchSynced<T extends EntityMeta>(
   row: T | undefined,
   updatedAt: string,
   save: (next: T) => Promise<unknown>,
-): Promise<void> {
-  if (!row || row.updatedAt !== updatedAt || row.syncStatus === 'synced') return;
+): Promise<boolean> {
+  if (!row || row.updatedAt !== updatedAt || row.syncStatus === 'synced') return false;
   await save({ ...row, syncStatus: 'synced' });
+  return true;
 }
 
-async function markTable(entity: SyncEntityName, id: string, updatedAt: string): Promise<void> {
+async function markTable(entity: SyncEntityName, id: string, updatedAt: string): Promise<boolean> {
   switch (entity) {
     case 'users':
       return touchSynced(await db.users.get(id), updatedAt, (next) => db.users.put(next));
@@ -66,8 +67,8 @@ async function markTable(entity: SyncEntityName, id: string, updatedAt: string):
   }
 }
 
-export async function markSyncedIfUnchanged(entity: SyncEntityName, id: string, updatedAt: string): Promise<void> {
-  await markTable(entity, id, updatedAt);
+export async function markSyncedIfUnchanged(entity: SyncEntityName, id: string, updatedAt: string): Promise<boolean> {
+  return markTable(entity, id, updatedAt);
 }
 
 export async function applyRemoteRecord(parsed: ParsedEntity): Promise<'applied' | 'kept-local'> {

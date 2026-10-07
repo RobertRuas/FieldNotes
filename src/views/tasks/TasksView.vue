@@ -12,6 +12,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/vue';
+import AppHeader from '@/components/AppHeader.vue';
 import EmptyState from '@/components/EmptyState.vue';
 import SyncStatus from '@/components/SyncStatus.vue';
 import TaskForm from '@/components/TaskForm.vue';
@@ -49,14 +50,8 @@ function openNote(id: string): void {
 
 <template>
   <ion-page>
-    <ion-header class="fn-header">
-      <ion-toolbar>
-        <div class="fn-titlebar">
-          <h1>Tarefas</h1>
-        </div>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content class="fn-page" fullscreen>
+    <AppHeader title="Tarefas" />
+    <ion-content class="fn-page">
       <SyncStatus />
       <form class="fn-form" @submit.prevent="add">
         <ion-input

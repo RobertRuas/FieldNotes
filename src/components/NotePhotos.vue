@@ -1,17 +1,22 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref } from 'vue';
 import { Capacitor } from '@capacitor/core';
-import { IonButton, IonButtons, IonHeader, IonModal, IonTitle, IonToolbar } from '@ionic/vue';
+import { IonButton, IonButtons, IonHeader, IonIcon, IonModal, IonTitle, IonToolbar } from '@ionic/vue';
+import { closeOutline } from 'ionicons/icons';
+import SyncMark from '@/components/SyncMark.vue';
 import TransferLine from '@/components/TransferLine.vue';
 import { pushToast } from '@/composables/useToast';
 import { useAttachmentsStore } from '@/stores/attachmentsStore';
 import type { Attachment } from '@/types/entities';
-import { visibleTransfer } from '@/sync/fileQueue';
+import { transferAsSync, visibleTransfer } from '@/sync/fileQueue';
+import { fileSizeLabel } from '@/utils/files';
 
-const props = defineProps<{ noteId: string; bare?: boolean }>();
+const props = withDefaults(
+  defineProps<{ noteId: string; bare?: boolean; editable?: boolean }>(),
+  { editable: true },
+);
 const emit = defineEmits<{ changed: [] }>();
 const attachments = useAttachmentsStore();
-const cameraInput = ref<HTMLInputElement | null>(null);
 const libraryInput = ref<HTMLInputElement | null>(null);
 const viewUrl = ref<string | null>(null);
 const viewName = ref('');
@@ -33,19 +38,6 @@ async function addMany(files: File[]): Promise<void> {
     if (created) added = true;
   }
   if (added) emit('changed');
-}
-
-async function takePhoto(): Promise<void> {
-  if (Capacitor.isNativePlatform()) {
-    try {
-      const created = await attachments.addFromNative(props.noteId, 'camera');
-      if (created) emit('changed');
-    } catch {
-      pushToast('Não foi possível abrir a câmera.');
-    }
-    return;
-  }
-  cameraInput.value?.click();
 }
 
 async function pickPhoto(): Promise<void> {
@@ -90,25 +82,27 @@ onBeforeUnmount(closePhoto);
   <section v-if="!bare || photos.length > 0" class="fn-media" :class="{ 'is-bare': bare }" aria-label="Fotos">
     <h2 v-if="!bare">Fotos</h2>
     <div v-if="!bare" class="fn-media-actions">
-      <ion-button size="small" @click="takePhoto">Tirar foto</ion-button>
-      <ion-button size="small" fill="outline" @click="pickPhoto">Escolher foto</ion-button>
+      <ion-button size="small" fill="outline" @click="pickPhoto">Adicionar fotografia</ion-button>
     </div>
-    <input ref="cameraInput" class="fn-sr" type="file" accept="image/*" capture="environment" aria-label="Tirar foto" @change="addMany(filesOf($event))" />
-    <input ref="libraryInput" class="fn-sr" type="file" accept="image/*" multiple aria-label="Escolher foto" @change="addMany(filesOf($event))" />
+    <input ref="libraryInput" class="fn-sr" type="file" accept="image/*" multiple aria-label="Adicionar fotografia" @change="addMany(filesOf($event))" />
     <p v-if="photos.length === 0 && !bare" class="fn-muted">Nenhuma foto nesta nota.</p>
-    <div v-else class="fn-photos">
-      <figure v-for="photo in photos" :key="photo.id" class="fn-photo-card">
-        <button type="button" class="fn-photo-hit" :aria-label="`Abrir ${photo.name}`" @click="openPhoto(photo)">
-          <img v-if="photo.thumbnail" :src="photo.thumbnail" alt="" />
-          <span v-else class="fn-photo-fallback">Foto</span>
+    <p v-if="photos.length > 0" class="fn-attach-cat">Fotos</p>
+    <ul v-if="photos.length > 0" class="fn-attach-list">
+      <li v-for="photo in photos" :key="photo.id">
+        <button type="button" class="fn-attach-name" :aria-label="`Abrir ${photo.name}`" @click="openPhoto(photo)">
+          {{ photo.name }}
+        </button>
+        <small>{{ fileSizeLabel(photo.size) }}</small>
+        <SyncMark :status="transferAsSync(visibleTransfer(photo, attachments.transferFor(photo.id)))" />
+        <button v-if="editable" type="button" class="fn-attach-x" :aria-label="`Excluir ${photo.name}`" @click="remove(photo)">
+          <ion-icon :icon="closeOutline" aria-hidden="true" />
         </button>
         <TransferLine
           :status="visibleTransfer(photo, attachments.transferFor(photo.id))"
           @retry="attachments.retry(photo.id)"
         />
-        <button type="button" class="fn-text-btn" :aria-label="`Excluir ${photo.name}`" @click="remove(photo)">Excluir</button>
-      </figure>
-    </div>
+      </li>
+    </ul>
     <ion-modal :is-open="viewUrl !== null" @didDismiss="closePhoto">
       <ion-header>
         <ion-toolbar>

@@ -11,6 +11,21 @@ export const useAuthStore = defineStore('authStore', () => {
   const userId = computed(() => user.value?.id ?? null);
   const remoteConfigured = computed(() => isRemoteConfigured());
   const signedIn = computed(() => accountEmail.value !== null);
+  const ready = ref(false);
+  let resolveReady: () => void = () => undefined;
+  const readyPromise = new Promise<void>((resolve) => {
+    resolveReady = resolve;
+  });
+
+  function markReady(): void {
+    if (ready.value) return;
+    ready.value = true;
+    resolveReady();
+  }
+
+  function whenReady(): Promise<void> {
+    return readyPromise;
+  }
 
   async function readSession(): Promise<void> {
     const client = await getSupabase();
@@ -47,5 +62,18 @@ export const useAuthStore = defineStore('authStore', () => {
     return AuthService.signOut().then(apply);
   }
 
-  return { user, accountEmail, userId, remoteConfigured, signedIn, hydrate, signIn, signUp, signOut };
+  return {
+    user,
+    accountEmail,
+    userId,
+    remoteConfigured,
+    signedIn,
+    ready,
+    markReady,
+    whenReady,
+    hydrate,
+    signIn,
+    signUp,
+    signOut,
+  };
 });

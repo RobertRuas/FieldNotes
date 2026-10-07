@@ -17,6 +17,8 @@ function cleanNote(note: Note): Note {
     documents: [...note.documents],
     audio: [...note.audio],
     tasks: [...note.tasks],
+    pinned: note.pinned === true,
+    favorite: note.favorite === true,
     syncStatus: 'pending',
   };
 }
@@ -83,6 +85,8 @@ export const NoteService = {
           documents: [],
           audio: [],
           tasks: [],
+          pinned: false,
+          favorite: false,
           date: pending.date,
           collectionId: pending.collectionId,
           reminderAt: pending.reminderAt,

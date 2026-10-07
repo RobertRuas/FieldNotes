@@ -23,8 +23,15 @@ export interface SyncSnapshot {
   lastError: string | null;
 }
 
+export interface LocalSyncMark {
+  entity: SyncOperation['entity'];
+  id: string;
+  updatedAt: string;
+}
+
 const listeners = new Set<(snapshot: SyncSnapshot) => void>();
 const appliedListeners = new Set<() => void>();
+const markedListeners = new Set<(mark: LocalSyncMark) => void>();
 
 let started = false;
 let syncing = false;
@@ -79,7 +86,11 @@ async function pushPending(): Promise<void> {
     await db.sync_queue.put(processing);
     try {
       const updatedAt = await supabaseGateway.push(op);
-      await markSyncedIfUnchanged(op.entity, op.entityId, updatedAt);
+      const marked = await markSyncedIfUnchanged(op.entity, op.entityId, updatedAt);
+      if (marked) {
+        const mark: LocalSyncMark = { entity: op.entity, id: op.entityId, updatedAt };
+        markedListeners.forEach((listener) => listener(mark));
+      }
       await db.sync_queue.delete(op.id);
     } catch (error) {
       failed = true;
@@ -171,5 +182,9 @@ export const SyncService = {
 
   onApplied(listener: () => void): void {
     appliedListeners.add(listener);
+  },
+
+  onMarked(listener: (mark: LocalSyncMark) => void): void {
+    markedListeners.add(listener);
   },
 };

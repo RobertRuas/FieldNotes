@@ -145,7 +145,7 @@ export const AuthService = {
     }
     const client = await getSupabase();
     if (client) {
-      const { error } = await client.auth.signOut();
+      const { error } = await client.auth.signOut({ scope: 'local' });
       if (error) return { ok: false, reason: error.message };
     }
     const user = current ?? (await this.ensureLocalUser());

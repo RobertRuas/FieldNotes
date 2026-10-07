@@ -6,7 +6,10 @@ import { openMicrophone, stopStream } from '@/services/platform/recorder';
 import { useAudioStore } from '@/stores/audioStore';
 import { clockLabel } from '@/utils/files';
 
-const props = defineProps<{ noteId: string; bare?: boolean }>();
+const props = withDefaults(
+  defineProps<{ noteId: string; bare?: boolean; editable?: boolean }>(),
+  { editable: true },
+);
 const emit = defineEmits<{ changed: [] }>();
 const audioStore = useAudioStore();
 
@@ -94,8 +97,18 @@ onBeforeUnmount(() => finish(false));
       <i class="fn-rec-dot" aria-hidden="true" />
       {{ clockLabel(elapsed) }}
     </p>
-    <div v-if="clips.length > 0" class="fn-clips">
-      <AudioClip v-for="clip in clips" :key="clip.id" :clip="clip" @removed="emit('changed')" />
-    </div>
+    <template v-if="clips.length > 0">
+      <p class="fn-attach-cat">Áudio</p>
+      <ul class="fn-attach-list">
+        <AudioClip
+          v-for="(clip, index) in clips"
+          :key="clip.id"
+          :clip="clip"
+          :label="`Áudio ${index + 1}`"
+          :editable="editable"
+          @removed="emit('changed')"
+        />
+      </ul>
+    </template>
   </section>
 </template>

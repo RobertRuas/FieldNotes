@@ -9,6 +9,40 @@ export function escapeHtml(text: string): string {
     .replaceAll('"', '&quot;');
 }
 
+export function htmlToMultilinePlain(html: string): string {
+  if (!html) return '';
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+
+  function walk(node: Node): string {
+    if (node.nodeType === Node.TEXT_NODE) {
+      return node.textContent ?? '';
+    }
+    if (node.nodeType !== Node.ELEMENT_NODE) return '';
+
+    const el = node as HTMLElement;
+    const tag = el.tagName;
+
+    if (tag === 'BR') return '\n';
+
+    let text = '';
+    for (const child of Array.from(el.childNodes)) {
+      text += walk(child);
+    }
+
+    if (['P', 'DIV', 'LI', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6'].includes(tag)) {
+      return `\n${text}\n`;
+    }
+    return text;
+  }
+
+  const raw = walk(doc.body);
+  return raw
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0)
+    .join('\n');
+}
+
 export function htmlToPlain(html: string): string {
   if (!html) return '';
   const doc = new DOMParser().parseFromString(html, 'text/html');

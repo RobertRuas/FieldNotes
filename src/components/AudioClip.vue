@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import { onBeforeUnmount, ref } from 'vue';
+import { IonIcon } from '@ionic/vue';
+import { closeOutline, pauseOutline, playOutline } from 'ionicons/icons';
+import SyncMark from '@/components/SyncMark.vue';
 import TransferLine from '@/components/TransferLine.vue';
 import { useAudioStore } from '@/stores/audioStore';
 import type { AudioRecording } from '@/types/entities';
-import { visibleTransfer } from '@/sync/fileQueue';
+import { transferAsSync, visibleTransfer } from '@/sync/fileQueue';
 import { clockLabel } from '@/utils/files';
 
-const props = defineProps<{ clip: AudioRecording }>();
+const props = withDefaults(
+  defineProps<{ clip: AudioRecording; label?: string; editable?: boolean }>(),
+  { editable: true },
+);
 const emit = defineEmits<{ removed: [] }>();
 const audioStore = useAudioStore();
 const player = ref<HTMLAudioElement | null>(null);
@@ -40,14 +46,6 @@ function onTime(): void {
   position.value = element.currentTime * 1000;
 }
 
-function seek(event: Event): void {
-  const element = player.value;
-  const input = event.target;
-  if (!element || !(input instanceof HTMLInputElement)) return;
-  element.currentTime = Number(input.value) / 1000;
-  position.value = element.currentTime * 1000;
-}
-
 function ended(): void {
   playing.value = false;
   position.value = 0;
@@ -65,26 +63,20 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <article class="fn-player">
-    <button type="button" class="fn-text-btn" :aria-label="playing ? 'Pausar' : 'Ouvir'" @click="toggle">
-      {{ playing ? 'Pausar' : 'Ouvir' }}
+  <li class="fn-attach-audio">
+    <button type="button" class="fn-attach-play" :aria-label="playing ? 'Pausar' : 'Ouvir'" @click="toggle">
+      <ion-icon :icon="playing ? pauseOutline : playOutline" aria-hidden="true" />
     </button>
-    <label class="fn-player-bar">
-      <span class="fn-sr">Progresso</span>
-      <input
-        type="range"
-        min="0"
-        :max="Math.max(clip.durationMs, 1)"
-        :value="position"
-        @input="seek"
-      />
-      <small>{{ clockLabel(position) }} / {{ clockLabel(clip.durationMs) }}</small>
-    </label>
-    <button type="button" class="fn-text-btn" aria-label="Excluir áudio" @click="remove">Excluir</button>
+    <span class="fn-attach-name">{{ label || 'Áudio' }}</span>
+    <small>{{ clockLabel(position) }}/{{ clockLabel(clip.durationMs) }}</small>
+    <SyncMark :status="transferAsSync(visibleTransfer(clip, audioStore.transferFor(clip.id)))" />
+    <button v-if="editable" type="button" class="fn-attach-x" aria-label="Excluir áudio" @click="remove">
+      <ion-icon :icon="closeOutline" aria-hidden="true" />
+    </button>
     <TransferLine
       :status="visibleTransfer(clip, audioStore.transferFor(clip.id))"
       @retry="audioStore.retry(clip.id)"
     />
     <audio ref="player" preload="none" @timeupdate="onTime" @ended="ended" />
-  </article>
+  </li>
 </template>

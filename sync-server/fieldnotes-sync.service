@@ -1,0 +1,16 @@
+[Unit]
+Description=FieldNotes sync
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+EnvironmentFile=/etc/fieldnotes/sync.env
+ExecStart=/usr/bin/python3 /opt/fieldnotes-sync/app.py
+Restart=on-failure
+RestartSec=2
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

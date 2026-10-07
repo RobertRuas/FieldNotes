@@ -10,29 +10,48 @@
   --fn-accent: #0e6b63;
   --fn-accent-ink: #f7f4ee;
   --fn-mark: #e07a3d;
+  --fn-ok: #1f7a45;
   --fn-danger: #9f2d24;
   --fn-shadow: 0 10px 28px rgba(26, 35, 48, 0.08);
   --fn-shadow-soft: 0 1px 2px rgba(26, 35, 48, 0.06);
   --fn-blur: 22px;
-  --fn-radius-sm: 12px;
-  --fn-radius: 18px;
-  --fn-radius-lg: 26px;
+  --fn-radius-sm: 8px;
+  --fn-radius: 14px;
+  --fn-radius-lg: 20px;
   --fn-space-1: 4px;
   --fn-space-2: 8px;
   --fn-space-3: 12px;
   --fn-space-4: 16px;
-  --fn-space-5: 24px;
-  --fn-space-6: 32px;
+  --fn-space-5: 20px;
+  --fn-space-6: 28px;
   --fn-font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --fn-font-note: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+
+  /* Escala tipográfica padronizada e calibrada em toda a aplicação */
   --fn-text-xs: 11px;
-  --fn-text-sm: 13px;
-  --fn-text-md: 16px;
-  --fn-text-lg: 20px;
-  --fn-text-xl: 28px;
-  --fn-note-size: 18px;
+  --fn-text-sm: 12px;
+  --fn-text-base: 13px;
+  --fn-text-md: 14px;
+  --fn-text-lg: 16px;
+  --fn-text-xl: 18px;
+
+  /* Cabeçalho e menu inferior calibrados para mobile */
+  --fn-header-title-size: 16px;
+  --fn-header-icon-size: 20px;
+  --fn-tab-icon-size: 24px;
+  --fn-tab-label-size: 11px;
+
+  /* Dimensões padronizadas de elementos interativos e botões */
+  --fn-control-height: 40px;
+  --fn-button-height: 40px;
+  --fn-target-size: 36px;
+  --fn-icon-size: 18px;
+
+  /* Tamanho dinâmico do texto do bloco de notas */
+  --fn-note-size: 16px;
   --fn-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --fn-motion: 320ms;
+
   --ion-font-family: var(--fn-font-ui);
   --ion-background-color: var(--fn-bg);
   --ion-text-color: var(--fn-ink);
@@ -58,10 +77,11 @@
   --ion-placeholder-color: var(--fn-ink-soft);
 }
 
-:root[data-text-size='pequeno'] { --fn-note-size: 15px; }
-:root[data-text-size='normal'] { --fn-note-size: 18px; }
-:root[data-text-size='grande'] { --fn-note-size: 23px; }
-:root[data-text-size='muito-grande'] { --fn-note-size: 29px; }
+:root[data-text-size='minimo'] { --fn-note-size: 12px; }
+:root[data-text-size='pequeno'] { --fn-note-size: 14px; }
+:root[data-text-size='normal'] { --fn-note-size: 16px; }
+:root[data-text-size='grande'] { --fn-note-size: 20px; }
+:root[data-text-size='muito-grande'] { --fn-note-size: 25px; }
 
 html.ion-palette-dark,
 :root[data-theme='dark'] {
@@ -76,6 +96,7 @@ html.ion-palette-dark,
   --fn-accent: #7dcec6;
   --fn-accent-ink: #10211f;
   --fn-mark: #e38a55;
+  --fn-ok: #6dce8b;
   --fn-danger: #ff8d84;
   --fn-shadow: 0 14px 32px rgba(0, 0, 0, 0.35);
   --fn-shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.3);
@@ -108,6 +129,7 @@ html.ion-palette-dark,
     --fn-accent: #7dcec6;
     --fn-accent-ink: #10211f;
     --fn-mark: #e38a55;
+    --fn-ok: #6dce8b;
     --fn-danger: #ff8d84;
     --fn-shadow: 0 14px 32px rgba(0, 0, 0, 0.35);
     --fn-shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.3);

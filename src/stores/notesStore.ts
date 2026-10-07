@@ -15,10 +15,20 @@ export const useNotesStore = defineStore('notesStore', () => {
 
   const listRows = computed<NoteListRow[]>(() => buildNoteRows(notes.value, todayKey()));
 
+  const pinnedNotes = computed(() =>
+    notes.value.filter((note) => note.pinned).sort((left, right) => (left.updatedAt < right.updatedAt ? 1 : -1)),
+  );
+
   function notesOn(date: string): Note[] {
     return notes.value
-      .filter((note) => note.date === date)
+      .filter((note) => note.date === date && !note.pinned)
       .sort((left, right) => (left.createdAt < right.createdAt ? 1 : -1));
+  }
+
+  async function setFlag(id: string, change: Partial<Pick<Note, 'pinned' | 'favorite'>>): Promise<void> {
+    const current = notes.value.find((item) => item.id === id);
+    if (!current) return;
+    await save({ ...current, ...change, updatedAt: nowIso(), syncStatus: 'pending' });
   }
 
   async function hydrate(): Promise<void> {
@@ -74,6 +84,14 @@ export const useNotesStore = defineStore('notesStore', () => {
     }
   }
 
+  function adoptSynced(id: string, updatedAt: string): void {
+    const index = notes.value.findIndex((item) => item.id === id);
+    if (index < 0) return;
+    const current = notes.value[index];
+    if (!current || current.updatedAt !== updatedAt || current.syncStatus === 'synced') return;
+    notes.value[index] = { ...current, syncStatus: 'synced' };
+  }
+
   function setSelectedDate(date: string): void {
     selectedDate.value = date;
   }
@@ -87,12 +105,15 @@ export const useNotesStore = defineStore('notesStore', () => {
     selectedDate,
     viewMode,
     listRows,
+    pinnedNotes,
     notesOn,
     inCollection,
     hydrate,
     find,
     save,
     remove,
+    adoptSynced,
+    setFlag,
     setSelectedDate,
     toggleView,
   };

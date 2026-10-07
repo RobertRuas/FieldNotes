@@ -7,7 +7,10 @@ let clientPromise: Promise<SupabaseClient | null> | null = null;
 
 async function load(): Promise<SupabaseClient | null> {
   if (!isRemoteConfigured()) return null;
-  const url = import.meta.env.VITE_SUPABASE_URL ?? '';
+  // Em desenvolvimento o pedido sai do mesmo endereço da página. O Vite encaminha
+  // para o servidor. Assim o telemóvel, noutro host da rede, não esbarra no CORS.
+  const configured = import.meta.env.VITE_SUPABASE_URL ?? '';
+  const url = import.meta.env.DEV ? window.location.origin : configured;
   const key = import.meta.env.VITE_SUPABASE_ANON_KEY ?? '';
   const { createClient } = await import('@supabase/supabase-js');
   // Uma única instância: conta, fila e arquivos compartilham a mesma sessão.

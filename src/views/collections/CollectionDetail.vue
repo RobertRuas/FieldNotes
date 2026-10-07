@@ -15,6 +15,7 @@ import {
   IonToolbar,
 } from '@ionic/vue';
 import { ellipsisHorizontal } from 'ionicons/icons';
+import AppHeader from '@/components/AppHeader.vue';
 import EmptyState from '@/components/EmptyState.vue';
 import NoteCard from '@/components/NoteCard.vue';
 import SyncStatus from '@/components/SyncStatus.vue';
@@ -88,20 +89,12 @@ function back(): void {
 
 <template>
   <ion-page>
-    <ion-header class="fn-header">
-      <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-button fill="clear" @click="back">Coleções</ion-button>
-        </ion-buttons>
-        <ion-title>{{ collection?.name ?? 'Coleção' }}</ion-title>
-        <ion-buttons v-if="collection" slot="end">
-          <ion-button fill="clear" v-aria="'Ações da coleção'" @click="sheetOpen = true">
-            <ion-icon :icon="ellipsisHorizontal" aria-hidden="true" />
-          </ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content class="fn-page" fullscreen>
+    <AppHeader :title="collection?.name ?? 'Coleção'" back @back="back">
+      <ion-button v-if="collection" fill="clear" class="fn-icon-btn" v-aria="'Ações da coleção'" @click="sheetOpen = true">
+        <ion-icon :icon="ellipsisHorizontal" aria-hidden="true" />
+      </ion-button>
+    </AppHeader>
+    <ion-content class="fn-page">
       <p v-if="!collection" class="fn-boot" role="alert">Coleção não encontrada.</p>
       <template v-else>
         <SyncStatus />

@@ -2,7 +2,7 @@ export type SyncStatus = 'pending' | 'synced' | 'error' | 'conflict';
 
 export type ThemeMode = 'light' | 'dark' | 'auto';
 
-export type ContentTextSize = 'pequeno' | 'normal' | 'grande' | 'muito-grande';
+export type ContentTextSize = 'minimo' | 'pequeno' | 'normal' | 'grande' | 'muito-grande';
 
 export type DevicePlatform = 'web' | 'ios' | 'android';
 
@@ -51,6 +51,8 @@ export interface Note extends EntityMeta {
   date: string;
   collectionId: string | null;
   reminderAt: string | null;
+  pinned: boolean;
+  favorite: boolean;
 }
 
 export type TaskPriority = 'baixa' | 'normal' | 'alta';

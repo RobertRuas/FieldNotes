@@ -4,6 +4,7 @@ import { IonicVue } from '@ionic/vue';
 import { registerSW } from 'virtual:pwa-register';
 import App from './App.vue';
 import router from './router';
+import { useAuthStore } from './stores/authStore';
 import { useSyncStore } from './stores/syncStore';
 import { vAria } from './utils/aria';
 import { startup } from './utils/startup';
@@ -25,7 +26,7 @@ import './styles/global.css';
 const app = createApp(App);
 const pinia = createPinia();
 app.use(pinia);
-app.use(IonicVue, { mode: 'ios' });
+app.use(IonicVue, { mode: 'ios', scrollAssist: false, scrollPadding: false });
 app.use(router);
 app.directive('aria', vAria);
 
@@ -34,6 +35,8 @@ async function boot(): Promise<void> {
     await startup();
   } catch {
     useSyncStore().setBootError('Não foi possível abrir as notas neste aparelho.');
+  } finally {
+    useAuthStore().markReady();
   }
   await router.isReady();
   app.mount('#app');

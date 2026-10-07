@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import {
   WEEKDAY_LABELS,
   addDays,
+  addMonths,
   dayNumber,
   longDateLabel,
   monthCells,
@@ -27,15 +28,17 @@ const title = computed(() => monthTitle(props.selected));
 let originX = 0;
 let originY = 0;
 let tracking = false;
-let handleY = 0;
-let dragged = false;
 
 function select(date: string): void {
   emit('select', date);
 }
 
 function shift(delta: number): void {
-  emit('select', addDays(props.selected, delta * 7));
+  if (open.value) {
+    emit('select', addMonths(props.selected, delta));
+  } else {
+    emit('select', addDays(props.selected, delta * 7));
+  }
 }
 
 function onWeekDown(event: PointerEvent): void {
@@ -52,29 +55,7 @@ function onWeekUp(event: PointerEvent): void {
   if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy)) shift(dx < 0 ? 1 : -1);
 }
 
-function onHandleDown(event: PointerEvent): void {
-  handleY = event.clientY;
-  dragged = false;
-  const target = event.currentTarget;
-  if (target instanceof HTMLElement) target.setPointerCapture(event.pointerId);
-}
-
-function onHandleUp(event: PointerEvent): void {
-  const dy = event.clientY - handleY;
-  if (dy > 28) {
-    open.value = true;
-    dragged = true;
-  } else if (dy < -28) {
-    open.value = false;
-    dragged = true;
-  }
-}
-
-function onHandleClick(): void {
-  if (dragged) {
-    dragged = false;
-    return;
-  }
+function toggleMonth(): void {
   open.value = !open.value;
 }
 </script>
@@ -82,12 +63,43 @@ function onHandleClick(): void {
 <template>
   <section class="fn-cal" aria-label="Calendário">
     <div class="fn-cal-head">
-      <button type="button" class="fn-icon-btn" aria-label="Semana anterior" @click="shift(-1)">‹</button>
-      <h2>{{ title }}</h2>
-      <button type="button" class="fn-icon-btn" aria-label="Próxima semana" @click="shift(1)">›</button>
+      <button
+        type="button"
+        class="fn-icon-btn"
+        :aria-label="open ? 'Mês anterior' : 'Semana anterior'"
+        @click="shift(-1)"
+      >
+        ‹
+      </button>
+      <button
+        type="button"
+        class="fn-month-title"
+        :aria-expanded="open"
+        aria-controls="fn-month"
+        @click="toggleMonth"
+      >
+        <span>{{ title }}</span>
+        <span class="fn-cal-arrow" :class="{ open }" aria-hidden="true">▾</span>
+      </button>
+      <button
+        type="button"
+        class="fn-icon-btn"
+        :aria-label="open ? 'Próximo mês' : 'Próxima semana'"
+        @click="shift(1)"
+      >
+        ›
+      </button>
       <button v-if="selected !== today" type="button" class="fn-text-btn" @click="select(today)">Hoje</button>
     </div>
-    <div class="fn-week" @pointerdown="onWeekDown" @pointerup="onWeekUp" @pointercancel="onWeekUp">
+
+    <!-- Quando recolhido: exibe a linha da semana -->
+    <div
+      v-if="!open"
+      class="fn-week"
+      @pointerdown="onWeekDown"
+      @pointerup="onWeekUp"
+      @pointercancel="onWeekUp"
+    >
       <button
         v-for="(date, index) in week"
         :key="date"
@@ -102,20 +114,9 @@ function onHandleClick(): void {
         <span class="fn-dot" :class="{ show: markedSet.has(date) }" />
       </button>
     </div>
-    <button
-      type="button"
-      class="fn-handle"
-      :aria-expanded="open"
-      aria-controls="fn-month"
-      @pointerdown="onHandleDown"
-      @pointerup="onHandleUp"
-      @pointercancel="onHandleUp"
-      @click="onHandleClick"
-    >
-      <span class="fn-grab" aria-hidden="true" />
-      <span>{{ open ? 'Recolher mês' : 'Mês' }}</span>
-    </button>
-    <div id="fn-month" class="fn-month" :class="{ open }">
+
+    <!-- Quando expandido: a linha da semana dá lugar à grade completa do mês (sem duplicar) -->
+    <div v-else id="fn-month" class="fn-month open">
       <div class="fn-month-inner">
         <div class="fn-month-grid">
           <span v-for="label in WEEKDAY_LABELS" :key="label" class="fn-month-label">{{ label }}</span>
@@ -129,7 +130,8 @@ function onHandleClick(): void {
             :aria-label="longDateLabel(cell.date)"
             @click="select(cell.date)"
           >
-            {{ dayNumber(cell.date) }}
+            <span>{{ dayNumber(cell.date) }}</span>
+            <span class="fn-dot" :class="{ show: markedSet.has(cell.date) }" />
           </button>
         </div>
       </div>

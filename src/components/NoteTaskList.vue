@@ -1,26 +1,29 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import { IonButton, IonInput, IonItem, IonItemOption, IonItemOptions, IonItemSliding } from '@ionic/vue';
+import { computed, nextTick, ref } from 'vue';
+import { IonIcon } from '@ionic/vue';
+import { closeOutline } from 'ionicons/icons';
 import { useTasksStore } from '@/stores/tasksStore';
-import { readIonText } from '@/utils/ionic';
 
-const props = defineProps<{
-  noteId: string;
-  collectionId: string | null;
-  date: string;
-}>();
+const props = withDefaults(
+  defineProps<{
+    noteId: string;
+    collectionId: string | null;
+    date: string;
+    editable?: boolean;
+  }>(),
+  {
+    editable: true,
+  },
+);
 
 const emit = defineEmits<{ changed: [] }>();
 const tasks = useTasksStore();
 const draft = ref('');
-const field = ref<unknown>(null);
-const section = ref<HTMLElement | null>(null);
+const composing = ref(false);
+const field = ref<HTMLInputElement | null>(null);
 
 const items = computed(() => tasks.forNote(props.noteId));
-
-function onDraft(event: Event): void {
-  draft.value = readIonText(event);
-}
+const visible = computed(() => items.value.length > 0 || composing.value);
 
 async function add(): Promise<void> {
   const created = await tasks.add({
@@ -39,64 +42,50 @@ async function remove(id: string): Promise<void> {
   emit('changed');
 }
 
-function focusable(value: unknown): { setFocus: () => Promise<void> } | null {
-  if (!value || typeof value !== 'object' || !('setFocus' in value)) return null;
-  const method = value.setFocus;
-  if (typeof method !== 'function') return null;
-  return {
-    setFocus: () => Promise.resolve((method as () => Promise<void> | void).call(value)),
-  };
+function onBlur(): void {
+  if (!draft.value.trim()) composing.value = false;
 }
 
 async function focusNew(): Promise<void> {
-  section.value?.scrollIntoView({ block: 'nearest' });
-  await focusable(field.value)?.setFocus();
+  composing.value = true;
+  await nextTick();
+  field.value?.focus();
 }
 
 defineExpose({ focusNew });
 </script>
 
 <template>
-  <section ref="section" class="fn-note-tasks" aria-label="Tarefas da nota">
-    <h2>Tarefas</h2>
-    <div v-if="items.length === 0" class="fn-muted">Nenhuma tarefa nesta nota.</div>
-    <div v-else class="fn-task-stack">
-      <div v-for="task in items" :key="task.id" class="fn-row-host">
-        <ion-item-sliding class="fn-slide">
-          <ion-item lines="none" class="fn-slide-item">
-            <div class="fn-task-line">
-              <button
-                type="button"
-                class="fn-checkhit"
-                :aria-pressed="task.done"
-                :aria-label="task.done ? 'Marcar como pendente' : 'Marcar como feita'"
-                @click="tasks.toggle(task.id)"
-              >
-                <i />
-              </button>
-              <span :class="{ 'fn-task-done': task.done }">{{ task.title }}</span>
-              <button type="button" class="fn-text-btn" :aria-label="`Excluir ${task.title}`" @click="remove(task.id)">
-                Excluir
-              </button>
-            </div>
-          </ion-item>
-          <ion-item-options side="end">
-            <ion-item-option color="danger" @click="remove(task.id)">Excluir</ion-item-option>
-          </ion-item-options>
-        </ion-item-sliding>
-      </div>
-    </div>
-    <form class="fn-task-add" @submit.prevent="add">
-      <ion-input
+  <section v-show="visible" class="fn-note-tasks" aria-label="Tarefas da nota">
+    <p class="fn-attach-cat">Tarefas</p>
+    <ul v-if="items.length > 0" class="fn-attach-list">
+      <li v-for="task in items" :key="task.id">
+        <button
+          type="button"
+          class="fn-checkhit"
+          :aria-pressed="task.done"
+          :aria-label="task.done ? 'Marcar como pendente' : 'Marcar como feita'"
+          @click="tasks.toggle(task.id)"
+        >
+          <i />
+        </button>
+        <span class="fn-attach-name" :class="{ 'fn-task-done': task.done }">{{ task.title }}</span>
+        <button v-if="editable" type="button" class="fn-attach-x" :aria-label="`Excluir ${task.title}`" @click="remove(task.id)">
+          <ion-icon :icon="closeOutline" aria-hidden="true" />
+        </button>
+      </li>
+    </ul>
+    <form v-if="composing && editable" class="fn-task-add" @submit.prevent="add">
+      <input
         ref="field"
-        v-aria="'Nova tarefa'"
-        label="Nova tarefa"
-        label-placement="stacked"
-        placeholder="O que falta fazer?"
-        :value="draft"
-        @ionInput="onDraft"
+        v-model="draft"
+        class="fn-task-draft"
+        type="text"
+        enterkeyhint="done"
+        aria-label="Nova tarefa"
+        placeholder="Nova tarefa"
+        @blur="onBlur"
       />
-      <ion-button type="submit" :disabled="draft.trim().length === 0">Adicionar</ion-button>
     </form>
   </section>
 </template>

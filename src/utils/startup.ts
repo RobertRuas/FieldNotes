@@ -19,6 +19,9 @@ import { resolveDark } from '@/utils/theme';
 export async function startup(): Promise<void> {
   await openDatabase();
   useSyncStore().listen();
+  SyncService.onMarked((mark) => {
+    if (mark.entity === 'notes') useNotesStore().adoptSynced(mark.id, mark.updatedAt);
+  });
   SyncService.onApplied(() => {
     void useNotesStore().hydrate();
     void useTasksStore().hydrate();

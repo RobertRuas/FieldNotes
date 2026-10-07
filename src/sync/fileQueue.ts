@@ -33,6 +33,12 @@ export function visibleTransfer(
   return 'aguardando';
 }
 
+export function transferAsSync(status: TransferStatus): 'pending' | 'synced' | 'error' {
+  if (status === 'sincronizado') return 'synced';
+  if (status === 'erro') return 'error';
+  return 'pending';
+}
+
 export function transferText(status: TransferStatus): string {
   if (status === 'sincronizando') return 'Sincronizando';
   if (status === 'sincronizado') return 'Sincronizado';

@@ -171,6 +171,8 @@ export function parseEntity(entity: SyncEntityName, value: unknown): ParsedEntit
           tasks,
           collectionId,
           reminderAt,
+          pinned: camel.pinned === true,
+          favorite: camel.favorite === true,
         },
       };
     }
@@ -254,6 +256,7 @@ export function parseEntity(entity: SyncEntityName, value: unknown): ParsedEntit
     case 'settings': {
       const theme = oneOf<ThemeMode>(camel.theme, ['light', 'dark', 'auto']);
       const contentTextSize = oneOf<ContentTextSize>(camel.contentTextSize, [
+        'minimo',
         'pequeno',
         'normal',
         'grande',
